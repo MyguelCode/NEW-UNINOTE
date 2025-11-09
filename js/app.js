@@ -65,6 +65,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       console.log('✅ Documento cargado y UI renderizada');
     }
 
+    // 6. Marcar inicialización como completa (CRÍTICO para permitir guardado)
+    STATE.isInitializing = false;
+    console.log('🎉 Inicialización completa - isInitializing = false');
+
     console.log('✅ Uninote cargado correctamente');
     console.log('📦 Arquitectura modular: Services, Controllers, UI, Features, Events');
     console.log('🎯 Event Handlers: Completamente refactorizados');
