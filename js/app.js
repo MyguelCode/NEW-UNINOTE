@@ -11,6 +11,7 @@ import { SearchService } from './services/SearchService.js';
 import { ArchiveService } from './services/ArchiveService.js';
 import { ExportImportService } from './services/ExportImportService.js';
 import { SecurityService } from './services/SecurityService.js';
+import { ButtonConfigService } from './services/ButtonConfigService.js';
 
 // === CONTROLADORES ===
 import { NoteController } from './controllers/NoteController.js';
@@ -44,6 +45,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // 2. Inicializar aplicación (tema, datos básicos)
     await initialize();
+
+    // 2.5. Inicializar configuración de botones
+    await ButtonConfigService.initialize();
 
     // 3. Inicializar todos los event handlers
     EventManager.initializeAll();
@@ -87,6 +91,7 @@ window.SearchService = SearchService;
 window.ArchiveService = ArchiveService;
 window.ExportImportService = ExportImportService;
 window.SecurityService = SecurityService;
+window.ButtonConfigService = ButtonConfigService;
 
 // Controladores
 window.NoteController = NoteController;

@@ -301,6 +301,81 @@
 
           <hr style="border: none; border-top: 1px solid var(--border-color); margin: 20px 0;">
 
+          <!-- Button Configuration Section -->
+          <div id="button-config-section">
+              <h3 style="margin-bottom: 15px;">⚙️ Configuración de Botones</h3>
+
+              <!-- Preset Modes -->
+              <div class="form-field">
+                  <label>Modos Predefinidos</label>
+                  <div class="preset-modes" style="display: flex; gap: 10px; margin-bottom: 15px;">
+                      <button id="preset-minimal-btn" class="modal-button" data-preset="minimal">Minimal</button>
+                      <button id="preset-estandar-btn" class="modal-button" data-preset="estandar">Estándar</button>
+                      <button id="preset-completo-btn" class="modal-button" data-preset="completo">Completo</button>
+                  </div>
+              </div>
+
+              <!-- Numeración Options -->
+              <div class="form-field">
+                  <label>Posición de Numeración</label>
+                  <div style="display: flex; flex-direction: column; gap: 8px;">
+                      <label style="font-weight: normal; cursor: pointer;">
+                          <input type="radio" name="numeracion" value="sin-numeracion">
+                          Sin numeración
+                      </label>
+                      <label style="font-weight: normal; cursor: pointer;">
+                          <input type="radio" name="numeracion" value="antes-contenido" checked>
+                          Antes del contenido (por defecto)
+                      </label>
+                      <label style="font-weight: normal; cursor: pointer;">
+                          <input type="radio" name="numeracion" value="antes-checkbox">
+                          Antes del checkbox (#3 ☑ ⠿)
+                      </label>
+                  </div>
+              </div>
+
+              <!-- Menu Display Option -->
+              <div class="form-field">
+                  <label style="display: flex; align-items: center; cursor: pointer; font-weight: normal;">
+                      <input type="checkbox" id="menu-show-text-toggle" style="margin-right: 8px;">
+                      Mostrar texto en menú de desbordamiento (⋮)
+                  </label>
+              </div>
+
+              <!-- Button Configuration Grid -->
+              <div class="form-field">
+                  <label>Configuración de Botones</label>
+                  <p style="font-size: 0.9em; color: var(--text-muted, #666); margin-bottom: 10px;">
+                      Arrastra los botones para reordenarlos. Click en 👁️ para mostrar/ocultar.
+                  </p>
+
+                  <div id="button-config-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                      <!-- Left Column -->
+                      <div>
+                          <h4 style="margin-bottom: 10px; font-size: 0.95em;">Botones Izquierdos</h4>
+                          <div id="left-buttons-container" class="buttons-container" data-column="left" style="min-height: 100px; border: 1px dashed var(--border-color); border-radius: 5px; padding: 10px;">
+                              <!-- Buttons will be rendered here -->
+                          </div>
+                      </div>
+
+                      <!-- Right Column -->
+                      <div>
+                          <h4 style="margin-bottom: 10px; font-size: 0.95em;">Botones Derechos</h4>
+                          <div id="right-buttons-container" class="buttons-container" data-column="right" style="min-height: 100px; border: 1px dashed var(--border-color); border-radius: 5px; padding: 10px;">
+                              <!-- Buttons will be rendered here -->
+                          </div>
+                      </div>
+                  </div>
+              </div>
+
+              <!-- Save Custom Mode -->
+              <div class="form-field">
+                  <button id="save-custom-mode-btn" class="modal-button confirm-action">💾 Guardar como Modo Personalizado</button>
+              </div>
+          </div>
+
+          <hr style="border: none; border-top: 1px solid var(--border-color); margin: 20px 0;">
+
           <div class="form-field" id="universal-password-container">
               <label for="universal-password-input">Contraseña Universal (para Bloqueo Rápido de Notas)</label>
                <div class="password-field-container">

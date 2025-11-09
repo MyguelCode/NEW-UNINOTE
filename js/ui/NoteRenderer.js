@@ -5,6 +5,7 @@
 import { STATE } from '../config/state.js';
 import { StateController } from '../controllers/StateController.js';
 import { NoteController } from '../controllers/NoteController.js';
+import { ButtonConfigService } from '../services/ButtonConfigService.js';
 
 export class NoteRenderer {
 
@@ -38,6 +39,105 @@ export class NoteRenderer {
     recursiveLoad(activeNotes, STATE.DOM.notesList);
     NoteController.ensureAtLeastOneNote();
     StateController.runUpdates();
+  }
+
+  /**
+   * Generate note HTML based on button configuration
+   */
+  static generateNoteHTML(noteData) {
+    const config = ButtonConfigService.getConfig();
+    const isArchiveView = STATE.isArchiveViewActive;
+    const { leftVisible, leftHidden, rightVisible, rightHidden } =
+      ButtonConfigService.getButtonsForNote(isArchiveView);
+
+    // Helper to create button HTML
+    const createButton = (btn) => {
+      const actionMap = {
+        'estado': 'cycle-status',
+        'fechaLimite': 'set-date',
+        'candado': 'lock',
+        'duplicar': 'duplicate',
+        'agregarHermana': 'add-sibling',
+        'agregarSubNota': 'add-subnote',
+        'emojiPicker': 'emoji-picker',
+        'archivar': 'archive',
+        'eliminar': 'delete',
+        'desarchivar': 'unarchive',
+        'fijar': 'pin',
+        'moverInicio': 'move-top',
+        'moverFinal': 'move-bottom',
+        'moverPosicion': 'move-to',
+        'promover': 'promote'
+      };
+
+      const action = actionMap[btn.id];
+      const title = btn.label;
+
+      // Special handling for certain buttons
+      if (btn.id === 'estado') {
+        return `<button data-action="${action}" title="Estado: Sin Hacer">⚪</button>`;
+      } else if (btn.id === 'agregarSubNota') {
+        return `<button data-action="${action}" title="${title}"><sub>➕</sub></button>`;
+      } else if (!btn.functional) {
+        // Phase 2 buttons - non-functional, show with opacity
+        return `<button data-action="${action}" title="${title} (Próximamente)" style="opacity: 0.5;">${btn.icon}</button>`;
+      } else {
+        return `<button data-action="${action}" title="${title}">${btn.icon}</button>`;
+      }
+    };
+
+    const parts = [];
+
+    // 1. FIXED ELEMENTS START
+
+    // Numeración antes del checkbox (if configured)
+    if (config.numeracion === 'antes-checkbox') {
+      parts.push(`<span class="note-number" title="Creado el: ${new Date(noteData.creationDate || new Date()).toLocaleString()}"></span>`);
+    }
+
+    // Checkbox (fixed)
+    parts.push(`<input type="checkbox" class="note-selector" title="Seleccionar nota">`);
+
+    // Drag handle (fixed)
+    parts.push(`<button class="drag-handle" data-action="drag" draggable="true" title="Arrastrar para mover">⠿</button>`);
+
+    // Note icon (fixed)
+    parts.push(`<span class="note-icon"></span>`);
+
+    // Toggle expand/collapse (fixed, before overflow menu)
+    parts.push(`<button data-action="toggle"></button>`);
+
+    // Overflow menu (fixed, only if there are hidden buttons)
+    const hasHiddenButtons = leftHidden.length > 0 || rightHidden.length > 0;
+    if (hasHiddenButtons) {
+      parts.push(`<button data-action="show-menu" title="Más Opciones">⋮</button>`);
+    }
+
+    // 2. LEFT VISIBLE BUTTONS
+    leftVisible.forEach(btn => {
+      parts.push(createButton(btn));
+    });
+
+    // 3. NUMERACIÓN (if antes-contenido)
+    if (config.numeracion === 'antes-contenido') {
+      parts.push(`<span class="note-number" title="Creado el: ${new Date(noteData.creationDate || new Date()).toLocaleString()}"></span>`);
+    }
+
+    // 4. COUNTDOWN TIMER (always between buttons and content)
+    parts.push(`<span class="countdown-timer"></span>`);
+
+    // 5. CONTENT (editable)
+    parts.push(`<div class="editable-note" contenteditable="true">${noteData.content || ''}</div>`);
+
+    // 6. RIGHT VISIBLE BUTTONS
+    rightVisible.forEach(btn => {
+      parts.push(createButton(btn));
+    });
+
+    // Note: Hidden buttons will be shown in the overflow menu (⋮)
+    // which is handled by existing event handlers
+
+    return `<div class="note-container">${parts.join('\n        ')}</div>`;
   }
 
   /**
@@ -75,35 +175,24 @@ export class NoteRenderer {
       li.dataset.lockedContent = noteData.content || '';
     }
 
-    li.innerHTML = `
-      <div class="note-container">
-        <input type="checkbox" class="note-selector" title="Seleccionar nota">
-        <button class="drag-handle" data-action="drag" draggable="true" title="Arrastrar para mover">⠿</button>
-        <span class="note-icon"></span>
-        <button data-action="cycle-status" title="Estado: Sin Hacer">⚪</button>
-        <button data-action="set-date" title="Asignar Fecha Límite">🗓️</button>
-        <span class="countdown-timer"></span>
-        <button data-action="lock" title="Opciones de Bloqueo">🔒</button>
-        <button data-action="duplicate" title="Duplicar Nota">⧉</button>
-        <button data-action="toggle"></button>
-        <span class="note-number" title="Creado el: ${new Date(noteData.creationDate).toLocaleString()}"></span>
-        <div class="editable-note" contenteditable="true">${noteData.content || ''}</div>
-        <button data-action="add-sibling" title="Añadir Nota Hermana">➕</button>
-        <button data-action="add-subnote" title="Añadir Subnota"><sub>➕</sub></button>
-        <button data-action="show-menu" title="Más Opciones">⋮</button>
-        <button data-action="unarchive" title="Desarchivar Nota">📤</button>
-        <button data-action="archive" title="Archivar Nota">📥</button>
-        <button data-action="delete" title="Eliminar Nota">🗑️</button>
-      </div>
-    `;
+    // Generate HTML using button configuration
+    li.innerHTML = this.generateNoteHTML(noteData);
 
+    // Update status button icon (if exists)
     const statusBtn = li.querySelector('[data-action="cycle-status"]');
-    switch(li.dataset.status) {
-      case 'inprogress': statusBtn.textContent = '🟡'; break;
-      case 'done': statusBtn.textContent = '🟢'; break;
-      default: statusBtn.textContent = '⚪'; break;
+    if (statusBtn) {
+      switch(li.dataset.status) {
+        case 'inprogress': statusBtn.textContent = '🟡'; break;
+        case 'done': statusBtn.textContent = '🟢'; break;
+        default: statusBtn.textContent = '⚪'; break;
+      }
     }
-    li.querySelector('.note-icon').textContent = noteData.icon || '';
+
+    // Update note icon
+    const noteIcon = li.querySelector('.note-icon');
+    if (noteIcon) {
+      noteIcon.textContent = noteData.icon || '';
+    }
 
     if (afterElement) {
       parentList.insertBefore(li, afterElement.nextSibling);

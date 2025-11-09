@@ -302,8 +302,23 @@ async function handleNoteAction(e, action, noteLi, noteData, parentArray, index,
       datePickerModalOverlay.classList.remove('hidden');
       break;
 
-    case 'show-menu':
+    case 'emoji-picker':
       e.stopPropagation();
+      const emojiRect = target.getBoundingClientRect();
+      iconPicker.style.display = 'block';
+      iconPicker.style.top = `${emojiRect.bottom + 5}px`;
+      let emojiLeftPos = emojiRect.left - iconPicker.offsetWidth + emojiRect.width;
+      if (emojiLeftPos < 0) emojiLeftPos = 5;
+      iconPicker.style.left = `${emojiLeftPos}px`;
+      STATE.activeNoteForMenu = noteLi;
+      document.querySelector('.picker-tabs button[data-tab="common"]').click();
+      break;
+
+    case 'show-menu':
+      // Show overflow menu with hidden buttons
+      e.stopPropagation();
+      // TODO: Implement overflow menu for hidden buttons
+      // For now, show icon picker (backward compatibility)
       const menuRect = target.getBoundingClientRect();
       iconPicker.style.display = 'block';
       iconPicker.style.top = `${menuRect.bottom + 5}px`;
@@ -472,6 +487,27 @@ async function handleNoteAction(e, action, noteLi, noteData, parentArray, index,
       noteLi.remove();
       NoteController.ensureAtLeastOneNote();
       StateController.runUpdates();
+      break;
+
+    // Phase 2 actions (not yet implemented)
+    case 'pin':
+      window.NotificationService.showNotification('Función "Fijar nota" próximamente', 'info');
+      break;
+
+    case 'move-top':
+      window.NotificationService.showNotification('Función "Mover al inicio" próximamente', 'info');
+      break;
+
+    case 'move-bottom':
+      window.NotificationService.showNotification('Función "Mover al final" próximamente', 'info');
+      break;
+
+    case 'move-to':
+      window.NotificationService.showNotification('Función "Mover a posición" próximamente', 'info');
+      break;
+
+    case 'promote':
+      window.NotificationService.showNotification('Función "Promover a principal" próximamente', 'info');
       break;
   }
 }

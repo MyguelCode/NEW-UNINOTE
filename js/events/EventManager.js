@@ -11,6 +11,7 @@ import { initializeUIEvents } from './uiEvents.js';
 import { initializeSecurityEvents } from './securityEvents.js';
 import { initializeArchiveEvents } from './archiveEvents.js';
 import { initializeImportExportEvents } from './importExportEvents.js';
+import { initializeButtonConfigEvents } from './buttonConfigEvents.js';
 
 /**
  * EventManager - Centralizes all event handler initialization
@@ -58,6 +59,10 @@ export class EventManager {
       // Import/Export
       initializeImportExportEvents();
       console.log('✅ Import/Export events initialized');
+
+      // Button configuration
+      initializeButtonConfigEvents();
+      console.log('✅ Button configuration events initialized');
 
       console.log('🎉 EventManager: Todos los event handlers inicializados correctamente!');
     } catch (error) {
