@@ -78,5 +78,26 @@ window.promptForDocumentPassword = SecurityService.promptForDocumentPassword.bin
 
 window.saveCurrentDocument = DocumentController.saveCurrentDocument.bind(DocumentController);
 
-// Cargar el código legacy funcional
-import './uninote-legacy.js';
+// Cargar UI y Features
+import { NoteRenderer } from './ui/NoteRenderer.js';
+import { Features } from './features/Features.js';
+
+// Exportar UI y Features globalmente
+window.NoteRenderer = NoteRenderer;
+window.Features = Features;
+
+// IMPORTANTE: uninote-legacy.js ha sido renombrado a uninote-legacy-BACKUP.js
+// La aplicación ahora usa completamente los módulos refactorizados
+// Si necesitas referencia al código original, consulta uninote-legacy-BACKUP.js
+
+// El código legacy funcional ahora está en módulos separados:
+// - Services: NotificationService, SearchService, ArchiveService, etc.
+// - Controllers: StateController, NoteController, DocumentController, etc.
+// - UI: NoteRenderer
+// - Features: Features (emoji, formatting, notifications, bulk actions)
+
+console.log('📦 Arquitectura modular cargada completamente');
+console.log('✨ Legacy code respaldado en: uninote-legacy-BACKUP.js');
+
+// NOTA: El código legacy (2,746 líneas) ha sido refactorizado en 13 módulos
+// Ver REFACTORIZATION.md para detalles completos
