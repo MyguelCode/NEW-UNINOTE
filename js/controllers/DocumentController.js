@@ -104,17 +104,31 @@ export class DocumentController {
    * Guardar documento actual
    */
   static async saveCurrentDocument() {
-    if (STATE.isInitializing) return;
+    console.log('💾 saveCurrentDocument llamado');
+    console.log('  - STATE.isInitializing:', STATE.isInitializing);
+    console.log('  - STATE.currentDocumentName:', STATE.currentDocumentName);
+    console.log('  - Tiene password:', !!STATE.appData.documentPasswords[STATE.currentDocumentName]);
+    console.log('  - Está unlocked:', STATE.unlockedDocuments.has(STATE.currentDocumentName));
+
+    if (STATE.isInitializing) {
+      console.log('❌ ABORTADO: isInitializing = true');
+      return;
+    }
     if (!STATE.currentDocumentName ||
         (STATE.appData.documentPasswords[STATE.currentDocumentName] &&
          !STATE.unlockedDocuments.has(STATE.currentDocumentName))) {
+      console.log('❌ ABORTADO: documento bloqueado o sin nombre');
       return;
     }
 
     console.log('💾 Guardando documento:', STATE.currentDocumentName, 'con', STATE.currentNotesData.length, 'notas');
+    console.log('📋 Contenido a guardar:', STATE.currentNotesData.map((n, idx) => `${idx}: ${n.content.substring(0, 20)}`));
 
     if (window.saveNotesToStorage) {
+      console.log('✅ window.saveNotesToStorage existe, llamando...');
       await window.saveNotesToStorage(STATE.currentDocumentName, STATE.currentNotesData);
+    } else {
+      console.error('❌ window.saveNotesToStorage NO ESTÁ DEFINIDO');
     }
 
     if (window.saveAppDataAsync) {
