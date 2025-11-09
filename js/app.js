@@ -38,6 +38,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     // 3. Inicializar todos los event handlers
     EventManager.initializeAll();
 
+    // 4. Inicializar Features (emoji picker, etc.)
+    if (Features && Features.populateEmojiPicker) {
+      Features.populateEmojiPicker();
+    }
+
+    // 5. Cargar documento activo inicial
+    const activeDoc = STATE.appData.activeDocument || STATE.appData.documents[0];
+    if (activeDoc) {
+      STATE.currentDocumentName = activeDoc;
+      await DocumentController.switchDocument(activeDoc);
+    }
+
     console.log('✅ Uninote cargado correctamente');
     console.log('📦 Arquitectura modular: Services, Controllers, UI, Features, Events');
     console.log('🎯 Event Handlers: Completamente refactorizados');
@@ -104,6 +116,9 @@ window.deleteCurrentDocument = helpers.deleteCurrentDocument;
 window.permanentlyRemoveLock = helpers.permanentlyRemoveLock;
 window.handleUnarchive = helpers.handleUnarchive;
 window.updateToggleVisibilityForNote = helpers.updateToggleVisibilityForNote;
+
+// Exportar funciones de Features
+window.showFormattingToolbar = Features.showFormattingToolbar.bind(Features);
 
 // ========================================
 // REFACTORIZACIÓN COMPLETA - FASE 2
