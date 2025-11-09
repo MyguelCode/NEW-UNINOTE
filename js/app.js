@@ -21,6 +21,16 @@ import { ArchiveController } from './controllers/ArchiveController.js';
 // === CORE ===
 import { eventBus } from './core/eventBus.js';
 
+// === UI Y FEATURES ===
+import { NoteRenderer } from './ui/NoteRenderer.js';
+import { Features } from './features/Features.js';
+
+// === UTILS ===
+import * as helpers from './utils/helpers.js';
+
+// === EVENT HANDLERS ===
+import { EventManager } from './events/EventManager.js';
+
 // IMPORTANTE: Este archivo carga los módulos refactorizados
 // El código funcional completo está en uninote-legacy.js
 // que se ejecuta automáticamente al final
@@ -44,10 +54,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // 5. Cargar documento activo inicial
+    console.log('📋 Paso 5: Cargando documento activo...');
     const activeDoc = STATE.appData.activeDocument || STATE.appData.documents[0];
+    console.log('📄 Documento activo:', activeDoc);
     if (activeDoc) {
       STATE.currentDocumentName = activeDoc;
+      console.log('🔄 Llamando a DocumentController.switchDocument...');
       await DocumentController.switchDocument(activeDoc);
+      console.log('✅ Documento cargado y UI renderizada');
     }
 
     console.log('✅ Uninote cargado correctamente');
@@ -91,16 +105,6 @@ window.performGlobalSearch = SearchService.performGlobalSearch.bind(SearchServic
 window.promptForDocumentPassword = SecurityService.promptForDocumentPassword.bind(SecurityService);
 
 window.saveCurrentDocument = DocumentController.saveCurrentDocument.bind(DocumentController);
-
-// === UI Y FEATURES ===
-import { NoteRenderer } from './ui/NoteRenderer.js';
-import { Features } from './features/Features.js';
-
-// === UTILS ===
-import * as helpers from './utils/helpers.js';
-
-// === EVENT HANDLERS ===
-import { EventManager } from './events/EventManager.js';
 
 // Exportar UI y Features globalmente
 window.NoteRenderer = NoteRenderer;
