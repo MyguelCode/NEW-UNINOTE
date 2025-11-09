@@ -161,13 +161,20 @@
     max-width: 600px;
 }
 
-/* App Settings Modal - más ancho para configuración de botones */
-#app-settings-modal .modal-box {
-    text-align: left;
-    max-width: 900px !important;
-    max-height: 90vh !important;
+/* App Settings Modal - MUCHO más ancho para configuración de botones */
+#app-settings-modal-overlay {
+    overflow: hidden !important;
+}
+
+#app-settings-modal-overlay .modal-box {
+    text-align: left !important;
+    max-width: 95vw !important;
+    width: 1400px !important;
+    max-height: 85vh !important;
     overflow-y: auto !important;
-    width: 90vw !important;
+    overflow-x: hidden !important;
+    padding: 1.5rem !important;
+    box-sizing: border-box !important;
 }
 
 #help-modal ul, #notification-list {

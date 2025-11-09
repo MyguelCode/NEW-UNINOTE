@@ -136,24 +136,28 @@ export class ButtonConfigService {
   /**
    * Preset modes - configuraciones predefinidas
    * IMPORTANTE: visibleButtons debe ser un array, no un Set (para serialización JSON)
+   * IMPORTANTE: leftButtons y rightButtons deben tener TODOS los botones, visibleButtons controla cuáles se ven
    */
   static PRESET_MODES = {
     minimal: {
       name: 'Minimal',
-      description: 'Solo elementos fijos esenciales',
+      description: 'Solo elementos fijos esenciales, todos los demás en menú ⋮',
       numeracion: 'antes-contenido',
-      leftButtons: [],
-      rightButtons: [],
-      visibleButtons: [], // Todos ocultos excepto fijos
-      menuShowText: false
+      // TODOS los botones en las listas (necesario para que aparezcan en menú ⋮)
+      leftButtons: ['estado', 'fechaLimite', 'candado', 'duplicar', 'fijar'],
+      rightButtons: ['emojiPicker', 'agregarHermana', 'agregarSubNota', 'moverInicio', 'moverFinal', 'moverPosicion', 'promover', 'archivar', 'eliminar'],
+      // NINGUNO visible - TODOS en menú ⋮
+      visibleButtons: [],
+      menuShowText: true // Mostrar texto en menú porque hay muchos botones
     },
     estandar: {
       name: 'Estándar',
       description: 'Configuración por defecto balanceada',
       numeracion: 'antes-contenido',
-      leftButtons: ['estado', 'fechaLimite', 'candado'],
-      rightButtons: ['emojiPicker', 'agregarHermana', 'agregarSubNota', 'duplicar', 'archivar', 'eliminar'],
-      // Solo los más usados están visibles, el resto en menú ⋮
+      // TODOS los botones en las listas
+      leftButtons: ['estado', 'fechaLimite', 'candado', 'duplicar', 'fijar'],
+      rightButtons: ['emojiPicker', 'agregarHermana', 'agregarSubNota', 'moverInicio', 'moverFinal', 'moverPosicion', 'promover', 'archivar', 'eliminar'],
+      // Solo los más usados visibles, el resto en menú ⋮
       visibleButtons: ['estado', 'emojiPicker', 'agregarHermana', 'agregarSubNota', 'archivar', 'eliminar'],
       menuShowText: false
     },
@@ -161,8 +165,10 @@ export class ButtonConfigService {
       name: 'Completo',
       description: 'Todos los botones visibles',
       numeracion: 'antes-contenido',
+      // TODOS los botones en las listas
       leftButtons: ['estado', 'fechaLimite', 'candado', 'duplicar', 'fijar'],
       rightButtons: ['emojiPicker', 'agregarHermana', 'agregarSubNota', 'moverInicio', 'moverFinal', 'moverPosicion', 'promover', 'archivar', 'eliminar'],
+      // TODOS visibles - NO aparece menú ⋮
       visibleButtons: ['estado', 'fechaLimite', 'candado', 'duplicar', 'emojiPicker', 'agregarHermana', 'agregarSubNota', 'archivar', 'eliminar', 'fijar', 'moverInicio', 'moverFinal', 'moverPosicion', 'promover'],
       menuShowText: true
     }
