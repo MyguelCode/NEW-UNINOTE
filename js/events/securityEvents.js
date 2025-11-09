@@ -134,12 +134,12 @@ export function initializeSecurityEvents() {
 
   // App settings button
   appSettingsBtn.addEventListener('click', () => {
-    document.getElementById('app-settings-overlay').classList.remove('hidden');
+    document.getElementById('app-settings-modal-overlay').classList.remove('hidden');
   });
 
   // Cancel app settings button
   document.getElementById('cancel-app-settings-btn').addEventListener('click', () => {
-    document.getElementById('app-settings-overlay').classList.add('hidden');
+    document.getElementById('app-settings-modal-overlay').classList.add('hidden');
   });
 
   // App lock enable toggle

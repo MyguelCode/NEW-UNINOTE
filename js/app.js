@@ -58,7 +58,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     const activeDoc = STATE.appData.activeDocument || STATE.appData.documents[0];
     console.log('📄 Documento activo:', activeDoc);
     if (activeDoc) {
-      STATE.currentDocumentName = activeDoc;
+      // NO establecer STATE.currentDocumentName aquí porque switchDocument lo hace
+      // y si lo establecemos, switchDocument retorna inmediatamente sin hacer nada
       console.log('🔄 Llamando a DocumentController.switchDocument...');
       await DocumentController.switchDocument(activeDoc);
       console.log('✅ Documento cargado y UI renderizada');
