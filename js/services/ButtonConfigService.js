@@ -152,8 +152,9 @@ export class ButtonConfigService {
       description: 'Configuración por defecto balanceada',
       numeracion: 'antes-contenido',
       leftButtons: ['estado', 'fechaLimite', 'candado'],
-      rightButtons: ['emojiPicker', 'duplicar', 'agregarHermana', 'agregarSubNota', 'archivar', 'eliminar'],
-      visibleButtons: ['estado', 'fechaLimite', 'candado', 'emojiPicker', 'duplicar', 'agregarHermana', 'agregarSubNota', 'archivar', 'eliminar'],
+      rightButtons: ['emojiPicker', 'agregarHermana', 'agregarSubNota', 'duplicar', 'archivar', 'eliminar'],
+      // Solo los más usados están visibles, el resto en menú ⋮
+      visibleButtons: ['estado', 'emojiPicker', 'agregarHermana', 'agregarSubNota', 'archivar', 'eliminar'],
       menuShowText: false
     },
     completo: {

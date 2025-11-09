@@ -12,9 +12,29 @@ export function initializeNoteEvents() {
   const notesList = document.getElementById('notes-list');
   const iconPicker = document.getElementById('icon-picker');
   const lockMenu = document.getElementById('lock-menu');
+  const overflowMenu = document.getElementById('overflow-menu');
   const datePickerModalOverlay = document.getElementById('date-picker-modal-overlay');
   const dateTimeInput = document.getElementById('date-time-input');
   const removeIconBtn = document.getElementById('remove-icon-btn');
+
+  // Overflow menu click handler
+  overflowMenu.addEventListener('click', async (e) => {
+    const button = e.target.closest('button');
+    if (!button || !STATE.activeNoteForMenu) return;
+
+    const noteLi = STATE.activeNoteForMenu;
+    const noteId = noteLi.dataset.id;
+    const { note: noteData, parentArray, index } = NoteController.findNoteData(STATE.currentNotesData, noteId) || {};
+
+    // Cerrar menú
+    overflowMenu.style.display = 'none';
+
+    // Ejecutar acción del botón
+    const action = button.dataset.action;
+    await handleNoteAction(e, action, noteLi, noteData, parentArray, index, button);
+
+    STATE.activeNoteForMenu = null;
+  });
 
   // Main note click handler
   document.querySelector('main').addEventListener('click', async (e) => {
@@ -317,16 +337,50 @@ async function handleNoteAction(e, action, noteLi, noteData, parentArray, index,
     case 'show-menu':
       // Show overflow menu with hidden buttons
       e.stopPropagation();
-      // TODO: Implement overflow menu for hidden buttons
-      // For now, show icon picker (backward compatibility)
+
+      // Obtener botones ocultos
+      const { leftHidden, rightHidden } = window.ButtonConfigService.getButtonsForNote(STATE.isArchiveViewActive);
+      const allHiddenButtons = [...leftHidden, ...rightHidden];
+
+      if (allHiddenButtons.length === 0) {
+        console.log('⚠️ No hay botones ocultos para mostrar en el menú');
+        return;
+      }
+
+      const overflowMenu = document.getElementById('overflow-menu');
+      const config = window.ButtonConfigService.getConfig();
+
+      // Generar contenido del menú
+      overflowMenu.innerHTML = '';
+      allHiddenButtons.forEach(btn => {
+        const button = document.createElement('button');
+        button.dataset.action = btn.action;
+
+        if (config.menuShowText) {
+          button.innerHTML = `${btn.icon} ${btn.label}`;
+        } else {
+          button.innerHTML = btn.icon;
+          button.title = btn.label;
+        }
+
+        // Estilo especial para botones Phase 2
+        if (!btn.functional) {
+          button.style.opacity = '0.5';
+          button.title = `${btn.label} (Próximamente)`;
+        }
+
+        overflowMenu.appendChild(button);
+      });
+
+      // Posicionar y mostrar menú
       const menuRect = target.getBoundingClientRect();
-      iconPicker.style.display = 'block';
-      iconPicker.style.top = `${menuRect.bottom + 5}px`;
-      let menuLeftPos = menuRect.left - iconPicker.offsetWidth + menuRect.width;
+      overflowMenu.style.display = 'block';
+      overflowMenu.style.top = `${menuRect.bottom + 5}px`;
+      let menuLeftPos = menuRect.left - overflowMenu.offsetWidth + menuRect.width;
       if (menuLeftPos < 0) menuLeftPos = 5;
-      iconPicker.style.left = `${menuLeftPos}px`;
+      overflowMenu.style.left = `${menuLeftPos}px`;
+
       STATE.activeNoteForMenu = noteLi;
-      document.querySelector('.picker-tabs button[data-tab="common"]').click();
       break;
 
     case 'duplicate':

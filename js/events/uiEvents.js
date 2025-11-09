@@ -266,4 +266,31 @@ export function initializeUIEvents() {
       window.ArchiveService.renderArchiveTimeline();
     }
   });
+
+  // Global click handler to close pickers/menus
+  document.addEventListener('click', (e) => {
+    // Cerrar overflow menu si se hace click fuera de él
+    const overflowMenu = document.getElementById('overflow-menu');
+    if (overflowMenu && overflowMenu.style.display === 'block') {
+      if (!e.target.closest('#overflow-menu') && !e.target.closest('[data-action="show-menu"]')) {
+        overflowMenu.style.display = 'none';
+      }
+    }
+
+    // Cerrar lock menu si se hace click fuera de él
+    const lockMenu = document.getElementById('lock-menu');
+    if (lockMenu && lockMenu.style.display === 'block') {
+      if (!e.target.closest('#lock-menu') && !e.target.closest('[data-action="lock"]')) {
+        lockMenu.style.display = 'none';
+      }
+    }
+
+    // Cerrar icon picker si se hace click fuera de él
+    const iconPicker = document.getElementById('icon-picker');
+    if (iconPicker && iconPicker.style.display === 'block') {
+      if (!e.target.closest('#icon-picker') && !e.target.closest('[data-action="emoji-picker"]') && !e.target.closest('.note-icon')) {
+        iconPicker.style.display = 'none';
+      }
+    }
+  });
 }

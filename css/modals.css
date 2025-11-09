@@ -156,9 +156,17 @@
 }
 
 /* Help Modal */
-#help-modal .modal-box, #notification-center-modal .modal-box, #app-settings-modal .modal-box {
+#help-modal .modal-box, #notification-center-modal .modal-box {
     text-align: left;
     max-width: 600px;
+}
+
+/* App Settings Modal - más ancho para configuración de botones */
+#app-settings-modal .modal-box {
+    text-align: left;
+    max-width: 900px;
+    max-height: 90vh;
+    overflow-y: auto;
 }
 
 #help-modal ul, #notification-list {
