@@ -59,7 +59,7 @@
         <button id="help-btn" title="Ayuda y Atajos">?</button>
         <button id="toggle-all-btn" title="Contraer/Expandir todas las notas">Contraer Todo</button>
         <div class="transfer-menu-container">
-            <button id="transfer-btn">Transferir v3.3 ⚙️⋮ ▾</button>
+            <button id="transfer-btn">Transferir v3.4 ⚙️⋮ ▾</button>
             <ul id="transfer-menu" class="hidden">
                 <li data-action="export-current">📤 Exportar Uninote Actual</li>
                 <li data-action="export-total">📤 Exportar Backup Total</li>
@@ -294,11 +294,9 @@
 
               <!-- Preset Modes -->
               <div class="form-field">
-                  <label>Modos Predefinidos</label>
-                  <div class="preset-modes" style="display: flex; gap: 10px; margin-bottom: 15px;">
-                      <button id="preset-minimal-btn" class="modal-button" data-preset="minimal">Minimal</button>
-                      <button id="preset-estandar-btn" class="modal-button" data-preset="estandar">Estándar</button>
-                      <button id="preset-completo-btn" class="modal-button" data-preset="completo">Completo</button>
+                  <label>Modos Predefinidos y Personalizados</label>
+                  <div class="preset-modes" style="display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap;">
+                      <!-- Buttons rendered dynamically by buttonConfigEvents.js -->
                   </div>
               </div>
 

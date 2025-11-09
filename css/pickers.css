@@ -127,13 +127,13 @@
     height: 40px;
 }
 
-/* Context Menu y Lock Menu */
-#context-menu, #lock-menu {
+/* Context Menu, Lock Menu y Overflow Menu */
+#context-menu, #lock-menu, #overflow-menu {
     padding: 5px;
     min-width: 240px;
 }
 
-#context-menu button, #lock-menu button {
+#context-menu button, #lock-menu button, #overflow-menu button {
     width: 100%;
     justify-content: flex-start;
     font-size: 0.9rem;
@@ -143,9 +143,10 @@
     padding: 8px 12px;
     text-align: left;
     border-radius: 4px;
+    display: block; /* Forzar vertical */
 }
 
-#context-menu button:hover, #lock-menu button:hover {
+#context-menu button:hover, #lock-menu button:hover, #overflow-menu button:hover {
     background-color: var(--selected-bg-color);
 }
 
@@ -155,7 +156,7 @@
     background-color: transparent;
 }
 
-#lock-menu hr {
+#lock-menu hr, #overflow-menu hr {
     border: none;
     border-top: 1px solid var(--border-color);
     margin: 5px 0;

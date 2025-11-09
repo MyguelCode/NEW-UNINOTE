@@ -288,6 +288,30 @@ export class ButtonConfigService {
   }
 
   /**
+   * Aplicar custom mode
+   */
+  static async applyCustomMode(customId) {
+    if (!this.currentConfig || !this.currentConfig.customModes || !this.currentConfig.customModes[customId]) {
+      console.error('❌ Custom mode no encontrado:', customId);
+      return;
+    }
+
+    const customMode = this.currentConfig.customModes[customId];
+    this.currentConfig = {
+      ...this.currentConfig,
+      numeracion: customMode.numeracion,
+      leftButtons: [...customMode.leftButtons],
+      rightButtons: [...customMode.rightButtons],
+      visibleButtons: new Set(customMode.visibleButtons),
+      menuShowText: customMode.menuShowText,
+      activeMode: customId
+    };
+
+    await this.saveConfiguration();
+    console.log('✅ Custom mode aplicado:', customMode.name);
+  }
+
+  /**
    * Obtener configuración actual
    */
   static getConfig() {
@@ -309,6 +333,10 @@ export class ButtonConfigService {
     if (!this.currentConfig) return;
 
     this.currentConfig.numeracion = option;
+    // Marcar como configuración personalizada si no es un custom mode ya guardado
+    if (!this.currentConfig.activeMode.startsWith('custom_')) {
+      this.currentConfig.activeMode = 'custom';
+    }
     await this.saveConfiguration();
     console.log('🔢 Numeración actualizada:', option);
   }
@@ -330,6 +358,11 @@ export class ButtonConfigService {
       this.currentConfig.rightButtons.splice(targetIndex, 0, buttonId);
     }
 
+    // Marcar como configuración personalizada si no es un custom mode ya guardado
+    if (!this.currentConfig.activeMode || !this.currentConfig.activeMode.startsWith('custom_')) {
+      this.currentConfig.activeMode = 'custom';
+    }
+
     await this.saveConfiguration();
     console.log('🔄 Botón movido:', buttonId, 'a', targetColumn, 'index', targetIndex);
   }
@@ -348,6 +381,11 @@ export class ButtonConfigService {
       console.log('👁️ Botón visible:', buttonId);
     }
 
+    // Marcar como configuración personalizada si no es un custom mode ya guardado
+    if (!this.currentConfig.activeMode || !this.currentConfig.activeMode.startsWith('custom_')) {
+      this.currentConfig.activeMode = 'custom';
+    }
+
     await this.saveConfiguration();
   }
 
@@ -358,6 +396,10 @@ export class ButtonConfigService {
     if (!this.currentConfig) return;
 
     this.currentConfig.menuShowText = !this.currentConfig.menuShowText;
+    // Marcar como configuración personalizada si no es un custom mode ya guardado
+    if (!this.currentConfig.activeMode || !this.currentConfig.activeMode.startsWith('custom_')) {
+      this.currentConfig.activeMode = 'custom';
+    }
     await this.saveConfiguration();
     console.log('📝 Menu show text:', this.currentConfig.menuShowText);
   }

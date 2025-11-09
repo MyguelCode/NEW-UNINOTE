@@ -7,24 +7,7 @@ import { NoteRenderer } from '../ui/NoteRenderer.js';
 import { STATE } from '../config/state.js';
 
 export function initializeButtonConfigEvents() {
-  // Preset mode buttons
-  const presetButtons = document.querySelectorAll('.preset-modes button');
-  presetButtons.forEach(btn => {
-    btn.addEventListener('click', async () => {
-      const preset = btn.dataset.preset;
-      await ButtonConfigService.applyPreset(preset);
-
-      // Re-render configuration UI
-      renderButtonConfigUI();
-
-      // Re-render all notes to apply new configuration
-      if (window.renderAppUI) {
-        window.renderAppUI();
-      }
-
-      window.NotificationService.showNotification(`Modo ${preset} aplicado`);
-    });
-  });
+  // Preset mode buttons are now rendered dynamically in renderButtonConfigUI()
 
   // Numeración radio buttons
   const numeracionRadios = document.querySelectorAll('input[name="numeracion"]');
@@ -69,15 +52,9 @@ export function initializeButtonConfigEvents() {
       );
 
       if (name && name.trim()) {
-        const description = await window.showPromptModal(
-          'Descripción (opcional)',
-          'Descripción del modo:',
-          { defaultValue: '' }
-        );
-
         const customId = await ButtonConfigService.createCustomMode(
           name.trim(),
-          description?.trim() || ''
+          '' // Sin descripción
         );
 
         window.NotificationService.showNotification(`Modo personalizado "${name}" guardado`);
@@ -98,18 +75,82 @@ export function initializeButtonConfigEvents() {
 function renderButtonConfigUI() {
   const config = ButtonConfigService.getConfig();
 
-  // Update active preset button
-  document.querySelectorAll('.preset-modes button').forEach(btn => {
-    if (btn.dataset.preset === config.activeMode) {
-      btn.style.fontWeight = 'bold';
-      btn.style.backgroundColor = 'var(--accent-color, #4CAF50)';
-      btn.style.color = 'white';
-    } else {
-      btn.style.fontWeight = 'normal';
-      btn.style.backgroundColor = '';
-      btn.style.color = '';
+  // Render all mode buttons (presets + custom)
+  const presetModesContainer = document.querySelector('.preset-modes');
+  if (presetModesContainer) {
+    presetModesContainer.innerHTML = '';
+
+    // Add preset buttons
+    const presets = ['minimal', 'estandar', 'completo'];
+    const presetLabels = { minimal: 'Minimal', estandar: 'Estándar', completo: 'Completo' };
+
+    presets.forEach(preset => {
+      const btn = document.createElement('button');
+      btn.className = 'modal-button';
+      btn.dataset.preset = preset;
+      btn.textContent = presetLabels[preset];
+
+      // Style if active
+      if (config.activeMode === preset) {
+        btn.style.fontWeight = 'bold';
+        btn.style.backgroundColor = 'var(--accent-color, #4CAF50)';
+        btn.style.color = 'white';
+      }
+
+      // Event listener
+      btn.addEventListener('click', async () => {
+        await ButtonConfigService.applyPreset(preset);
+        renderButtonConfigUI();
+        if (window.renderAppUI) window.renderAppUI();
+        window.NotificationService.showNotification(`Modo ${preset} aplicado`);
+      });
+
+      presetModesContainer.appendChild(btn);
+    });
+
+    // Add custom mode buttons
+    if (config.customModes && Object.keys(config.customModes).length > 0) {
+      Object.entries(config.customModes).forEach(([customId, customMode]) => {
+        const btn = document.createElement('button');
+        btn.className = 'modal-button';
+        btn.dataset.preset = customId;
+        btn.textContent = customMode.name;
+        btn.style.position = 'relative';
+
+        // Style if active
+        if (config.activeMode === customId) {
+          btn.style.fontWeight = 'bold';
+          btn.style.backgroundColor = 'var(--accent-color, #4CAF50)';
+          btn.style.color = 'white';
+        }
+
+        // Event listener to apply custom mode
+        btn.addEventListener('click', async () => {
+          await ButtonConfigService.applyCustomMode(customId);
+          renderButtonConfigUI();
+          if (window.renderAppUI) window.renderAppUI();
+          window.NotificationService.showNotification(`Modo "${customMode.name}" aplicado`);
+        });
+
+        // Add delete button (X)
+        const deleteBtn = document.createElement('span');
+        deleteBtn.textContent = '×';
+        deleteBtn.style.cssText = 'position: absolute; top: -5px; right: -5px; background: red; color: white; border-radius: 50%; width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; font-size: 14px; cursor: pointer; font-weight: bold;';
+        deleteBtn.title = 'Eliminar modo';
+        deleteBtn.addEventListener('click', async (e) => {
+          e.stopPropagation();
+          if (confirm(`¿Eliminar el modo "${customMode.name}"?`)) {
+            await ButtonConfigService.deleteCustomMode(customId);
+            renderButtonConfigUI();
+            window.NotificationService.showNotification(`Modo "${customMode.name}" eliminado`);
+          }
+        });
+
+        btn.appendChild(deleteBtn);
+        presetModesContainer.appendChild(btn);
+      });
     }
-  });
+  }
 
   // Update numeración radio
   const numeracionValue = config.numeracion || 'antes-contenido';
