@@ -37,20 +37,32 @@ export class DocumentController {
     STATE.appData.activeDocument = docName;
 
     // Cargar desde IndexedDB
+    console.log('🔍 window.isUsingIndexedDB:', typeof window.isUsingIndexedDB);
+    console.log('🔍 window.isUsingIndexedDB():', window.isUsingIndexedDB ? window.isUsingIndexedDB() : 'UNDEFINED');
+    console.log('🔍 window.loadDocumentAsync:', typeof window.loadDocumentAsync);
+
     let notesData;
     if (window.isUsingIndexedDB && window.isUsingIndexedDB()) {
+      console.log('✅ Usando IndexedDB para cargar documento');
       notesData = await window.loadDocumentAsync(docName);
       console.log('📖 Cargado desde IndexedDB - Orden:', notesData ? notesData.map((n, idx) => `${idx}: ${n.content.substring(0, 20)}`) : 'Sin datos');
     } else {
+      console.log('⚠️ Usando localStorage como fallback');
       const notesDataRaw = localStorage.getItem(`uninote_doc_${docName}`);
       notesData = notesDataRaw ? JSON.parse(notesDataRaw) : [];
     }
 
+    console.log('📊 Notas cargadas:', notesData.length);
     STATE.currentNotesData = notesData || [];
 
     // Renderizar UI
+    console.log('🎨 Renderizando UI...');
+    console.log('🔍 window.renderAppUI:', typeof window.renderAppUI);
     if (window.renderAppUI) {
       window.renderAppUI();
+      console.log('✅ UI renderizada');
+    } else {
+      console.error('❌ window.renderAppUI NO ESTÁ DEFINIDO');
     }
 
     // Guardar app data
