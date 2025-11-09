@@ -135,6 +135,7 @@ export class ButtonConfigService {
 
   /**
    * Preset modes - configuraciones predefinidas
+   * IMPORTANTE: visibleButtons debe ser un array, no un Set (para serialización JSON)
    */
   static PRESET_MODES = {
     minimal: {
@@ -143,7 +144,7 @@ export class ButtonConfigService {
       numeracion: 'antes-contenido',
       leftButtons: [],
       rightButtons: [],
-      visibleButtons: new Set(), // Todos ocultos excepto fijos
+      visibleButtons: [], // Todos ocultos excepto fijos
       menuShowText: false
     },
     estandar: {
@@ -152,7 +153,7 @@ export class ButtonConfigService {
       numeracion: 'antes-contenido',
       leftButtons: ['estado', 'fechaLimite', 'candado'],
       rightButtons: ['emojiPicker', 'duplicar', 'agregarHermana', 'agregarSubNota', 'archivar', 'eliminar'],
-      visibleButtons: new Set(['estado', 'fechaLimite', 'candado', 'emojiPicker', 'duplicar', 'agregarHermana', 'agregarSubNota', 'archivar', 'eliminar']),
+      visibleButtons: ['estado', 'fechaLimite', 'candado', 'emojiPicker', 'duplicar', 'agregarHermana', 'agregarSubNota', 'archivar', 'eliminar'],
       menuShowText: false
     },
     completo: {
@@ -161,7 +162,7 @@ export class ButtonConfigService {
       numeracion: 'antes-contenido',
       leftButtons: ['estado', 'fechaLimite', 'candado', 'duplicar', 'fijar'],
       rightButtons: ['emojiPicker', 'agregarHermana', 'agregarSubNota', 'moverInicio', 'moverFinal', 'moverPosicion', 'promover', 'archivar', 'eliminar'],
-      visibleButtons: new Set(['estado', 'fechaLimite', 'candado', 'duplicar', 'emojiPicker', 'agregarHermana', 'agregarSubNota', 'archivar', 'eliminar', 'fijar', 'moverInicio', 'moverFinal', 'moverPosicion', 'promover']),
+      visibleButtons: ['estado', 'fechaLimite', 'candado', 'duplicar', 'emojiPicker', 'agregarHermana', 'agregarSubNota', 'archivar', 'eliminar', 'fijar', 'moverInicio', 'moverFinal', 'moverPosicion', 'promover'],
       menuShowText: true
     }
   };
@@ -245,7 +246,14 @@ export class ButtonConfigService {
    * Obtener configuración actual
    */
   static getConfig() {
-    return this.currentConfig || this.PRESET_MODES.estandar;
+    if (!this.currentConfig) {
+      // Si no hay config, crear una temporal del preset estándar
+      const defaultConfig = JSON.parse(JSON.stringify(this.PRESET_MODES.estandar));
+      defaultConfig.visibleButtons = new Set(defaultConfig.visibleButtons);
+      defaultConfig.activeMode = 'estandar';
+      return defaultConfig;
+    }
+    return this.currentConfig;
   }
 
   /**
@@ -363,8 +371,9 @@ export class ButtonConfigService {
    * Verificar si un botón está visible
    */
   static isButtonVisible(buttonId) {
-    if (!this.currentConfig) return false;
-    return this.currentConfig.visibleButtons.has(buttonId);
+    const config = this.getConfig();
+    if (!config.visibleButtons) return false;
+    return config.visibleButtons.has(buttonId);
   }
 
   /**
