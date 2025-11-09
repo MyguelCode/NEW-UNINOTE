@@ -64,6 +64,26 @@ window.getStorageStats = async function() {
   return await StorageService.getStats();
 };
 
+/**
+ * Guarda notas al storage (wrapper para compatibilidad)
+ */
+window.saveNotesToStorage = async function(docName, notesData) {
+  try {
+    console.log('💿 Guardando en IndexedDB - Orden:', notesData.map((n, idx) => `${idx}: ${n.content.substring(0, 20)}`));
+    if (window.isUsingIndexedDB && window.isUsingIndexedDB()) {
+      await window.saveDocumentAsync(docName, notesData);
+    } else {
+      // Fallback a localStorage
+      localStorage.setItem(`uninote_doc_${docName}`, JSON.stringify(notesData));
+    }
+  } catch(e) {
+    console.error("Error al guardar notas:", e);
+    if (window.showNotification) {
+      window.showNotification("Error: No se pudieron guardar los cambios. El almacenamiento puede estar lleno.", 'error');
+    }
+  }
+};
+
 // Exportar StorageService para uso en módulos
 export { StorageService };
 export default StorageService;
