@@ -190,11 +190,49 @@ export class ButtonConfigService {
       const savedConfig = await window.loadSettingAsync('buttonConfiguration');
       if (savedConfig) {
         console.log('✅ Configuración cargada desde IndexedDB');
-        this.currentConfig = savedConfig;
+
+        // 🔄 MIGRATION: Detectar y corregir configuraciones antiguas
+        const needsMigration = (
+          !savedConfig.leftButtons ||
+          !savedConfig.rightButtons ||
+          savedConfig.leftButtons.length === 0 ||
+          savedConfig.rightButtons.length === 0
+        );
+
+        if (needsMigration) {
+          console.log('🔄 Migrando configuración antigua...');
+          // Obtener el preset activo o usar 'estandar' por defecto
+          const targetPreset = savedConfig.activeMode || 'estandar';
+          const presetData = this.PRESET_MODES[targetPreset] || this.PRESET_MODES.estandar;
+
+          // Combinar: mantener visibleButtons del usuario si son válidos, pero usar nuevos arrays de botones
+          this.currentConfig = {
+            ...savedConfig,
+            leftButtons: presetData.leftButtons,
+            rightButtons: presetData.rightButtons,
+            // Mantener la configuración de visibilidad del usuario si existe y es válida
+            visibleButtons: (savedConfig.visibleButtons && savedConfig.visibleButtons.length > 0)
+              ? savedConfig.visibleButtons
+              : presetData.visibleButtons
+          };
+
+          console.log('✅ Migración completada - leftButtons:', this.currentConfig.leftButtons.length,
+                      'rightButtons:', this.currentConfig.rightButtons.length);
+        } else {
+          this.currentConfig = savedConfig;
+        }
+
         // Convertir array a Set para visibleButtons
         if (Array.isArray(this.currentConfig.visibleButtons)) {
           this.currentConfig.visibleButtons = new Set(this.currentConfig.visibleButtons);
         }
+
+        // Guardar configuración migrada
+        if (needsMigration) {
+          await this.saveConfiguration();
+          console.log('💾 Configuración migrada guardada en IndexedDB');
+        }
+
         return;
       }
     }
