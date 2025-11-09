@@ -109,6 +109,7 @@ export class NoteRenderer {
 
     // Overflow menu (fixed, only if there are hidden buttons)
     const hasHiddenButtons = leftHidden.length > 0 || rightHidden.length > 0;
+    console.log(`🔍 NoteRenderer: leftHidden=${leftHidden.length}, rightHidden=${rightHidden.length}, hasHidden=${hasHiddenButtons}`);
     if (hasHiddenButtons) {
       parts.push(`<button data-action="show-menu" title="Más Opciones">⋮</button>`);
     }

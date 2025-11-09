@@ -164,9 +164,10 @@
 /* App Settings Modal - más ancho para configuración de botones */
 #app-settings-modal .modal-box {
     text-align: left;
-    max-width: 900px;
-    max-height: 90vh;
-    overflow-y: auto;
+    max-width: 900px !important;
+    max-height: 90vh !important;
+    overflow-y: auto !important;
+    width: 90vw !important;
 }
 
 #help-modal ul, #notification-list {

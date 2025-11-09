@@ -383,6 +383,8 @@ export class ButtonConfigService {
    */
   static getButtonsForNote(isArchiveView = false) {
     const config = this.getConfig();
+    console.log('🔍 getButtonsForNote - activeMode:', config.activeMode);
+    console.log('🔍 getButtonsForNote - visibleButtons:', Array.from(config.visibleButtons || []));
 
     const leftVisible = [];
     const leftHidden = [];
