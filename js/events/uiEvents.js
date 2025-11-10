@@ -267,7 +267,7 @@ export function initializeUIEvents() {
     }
   });
 
-  // Global click handler to close pickers/menus
+  // Global click handler to close pickers/menus and modals
   document.addEventListener('click', (e) => {
     // Cerrar overflow menu si se hace click fuera de él
     const overflowMenu = document.getElementById('overflow-menu');
@@ -290,6 +290,22 @@ export function initializeUIEvents() {
     if (iconPicker && iconPicker.style.display === 'block') {
       if (!e.target.closest('#icon-picker') && !e.target.closest('[data-action="emoji-picker"]') && !e.target.closest('.note-icon')) {
         iconPicker.style.display = 'none';
+      }
+    }
+
+    // Cerrar modales si se hace click en el overlay (fuera del modal-box)
+    if (e.target.classList.contains('modal-overlay')) {
+      const modalOverlay = e.target;
+      // Lista de modales que se pueden cerrar con click fuera
+      const closableModals = [
+        'help-modal-overlay',
+        'notification-center-overlay',
+        'app-settings-modal-overlay',
+        'date-picker-modal-overlay'
+      ];
+
+      if (closableModals.includes(modalOverlay.id)) {
+        modalOverlay.classList.add('hidden');
       }
     }
   });

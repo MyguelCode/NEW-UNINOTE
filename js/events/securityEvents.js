@@ -145,7 +145,7 @@ export function initializeSecurityEvents() {
   // App lock enable toggle
   appLockEnableToggle.addEventListener('change', async function (e) {
     const isChecked = e.target.checked;
-    const appLockControls = document.getElementById('app-lock-controls');
+    const appLockControls = document.getElementById('app-lock-password-container');
 
     if (isChecked) {
       if (!STATE.appData.masterPasswordHash) {
@@ -179,10 +179,64 @@ export function initializeSecurityEvents() {
   });
 
   // Password management buttons
-  document.getElementById('app-lock-create-btn').addEventListener('click', () => SecurityService.managePassword('master', 'create'));
-  document.getElementById('app-lock-change-btn').addEventListener('click', () => SecurityService.managePassword('master', 'change'));
-  document.getElementById('app-lock-remove-btn').addEventListener('click', () => SecurityService.managePassword('master', 'remove'));
-  document.getElementById('universal-create-btn').addEventListener('click', () => SecurityService.managePassword('universal', 'create'));
-  document.getElementById('universal-change-btn').addEventListener('click', () => SecurityService.managePassword('universal', 'change'));
-  document.getElementById('universal-remove-btn').addEventListener('click', () => SecurityService.managePassword('universal', 'remove'));
+  document.getElementById('app-lock-create-btn').addEventListener('click', async () => {
+    await SecurityService.managePassword('master', 'create');
+    updatePasswordFieldsDisplay();
+  });
+  document.getElementById('app-lock-change-btn').addEventListener('click', async () => {
+    await SecurityService.managePassword('master', 'change');
+    updatePasswordFieldsDisplay();
+  });
+  document.getElementById('app-lock-remove-btn').addEventListener('click', async () => {
+    await SecurityService.managePassword('master', 'remove');
+    updatePasswordFieldsDisplay();
+  });
+  document.getElementById('universal-create-btn').addEventListener('click', async () => {
+    await SecurityService.managePassword('universal', 'create');
+    updatePasswordFieldsDisplay();
+  });
+  document.getElementById('universal-change-btn').addEventListener('click', async () => {
+    await SecurityService.managePassword('universal', 'change');
+    updatePasswordFieldsDisplay();
+  });
+  document.getElementById('universal-remove-btn').addEventListener('click', async () => {
+    await SecurityService.managePassword('universal', 'remove');
+    updatePasswordFieldsDisplay();
+  });
+
+  // Update password fields on modal open
+  appSettingsBtn.addEventListener('click', () => {
+    updatePasswordFieldsDisplay();
+  });
+
+  // Initialize password fields display
+  updatePasswordFieldsDisplay();
+}
+
+/**
+ * Update password fields to show asterisks when password is set
+ */
+function updatePasswordFieldsDisplay() {
+  const masterPasswordInput = document.getElementById('app-lock-master-password-input');
+  const universalPasswordInput = document.getElementById('universal-password-input');
+
+  if (masterPasswordInput) {
+    if (STATE.appData.masterPasswordHash) {
+      masterPasswordInput.value = '••••••••••';
+      masterPasswordInput.style.color = 'var(--text-color)';
+    } else {
+      masterPasswordInput.value = '';
+      masterPasswordInput.placeholder = 'No configurada';
+    }
+  }
+
+  if (universalPasswordInput) {
+    if (STATE.appData.universalPassword) {
+      universalPasswordInput.value = '••••••••••';
+      universalPasswordInput.style.color = 'var(--text-color)';
+    } else {
+      universalPasswordInput.value = '';
+      universalPasswordInput.placeholder = 'No configurada';
+    }
+  }
 }

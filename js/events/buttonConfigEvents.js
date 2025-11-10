@@ -41,6 +41,38 @@ export function initializeButtonConfigEvents() {
     });
   }
 
+  // Update current mode button
+  const updateCurrentModeBtn = document.getElementById('update-current-mode-btn');
+  if (updateCurrentModeBtn) {
+    updateCurrentModeBtn.addEventListener('click', async () => {
+      const config = ButtonConfigService.getConfig();
+      const currentMode = config.activeMode;
+
+      // Verificar que sea un custom mode
+      if (!currentMode || !currentMode.startsWith('custom_')) {
+        window.NotificationService.showNotification('Solo puedes actualizar modos personalizados', 'warning');
+        return;
+      }
+
+      const customMode = config.customModes[currentMode];
+      if (!customMode) {
+        window.NotificationService.showNotification('Modo no encontrado', 'error');
+        return;
+      }
+
+      const confirmed = await window.NotificationService.showConfirmationModal(
+        'Actualizar Modo',
+        `¿Actualizar el modo "${customMode.name}" con la configuración actual?`
+      );
+
+      if (confirmed) {
+        await ButtonConfigService.updateCustomMode(currentMode);
+        window.NotificationService.showNotification(`Modo "${customMode.name}" actualizado`);
+        renderButtonConfigUI();
+      }
+    });
+  }
+
   // Save custom mode button
   const saveCustomModeBtn = document.getElementById('save-custom-mode-btn');
   if (saveCustomModeBtn) {
@@ -57,10 +89,14 @@ export function initializeButtonConfigEvents() {
           '' // Sin descripción
         );
 
-        window.NotificationService.showNotification(`Modo personalizado "${name}" guardado`);
+        // Auto-aplicar el modo recién creado
+        await ButtonConfigService.applyCustomMode(customId);
+
+        window.NotificationService.showNotification(`Modo "${name}" guardado y aplicado`);
 
         // Re-render to show new custom mode button
         renderButtonConfigUI();
+        if (window.renderAppUI) window.renderAppUI();
       }
     });
   }
@@ -160,6 +196,16 @@ function renderButtonConfigUI() {
   const menuShowTextToggle = document.getElementById('menu-show-text-toggle');
   if (menuShowTextToggle) {
     menuShowTextToggle.checked = config.menuShowText || false;
+  }
+
+  // Show/hide "Update Current Mode" button
+  const updateCurrentModeBtn = document.getElementById('update-current-mode-btn');
+  if (updateCurrentModeBtn) {
+    if (config.activeMode && config.activeMode.startsWith('custom_')) {
+      updateCurrentModeBtn.style.display = 'block';
+    } else {
+      updateCurrentModeBtn.style.display = 'none';
+    }
   }
 
   // Render button lists

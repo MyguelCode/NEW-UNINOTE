@@ -162,6 +162,25 @@
     margin: 5px 0;
 }
 
+/* Overflow menu - Grid mode (icon only) */
+#overflow-menu.icon-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 4px;
+    padding: 8px;
+    min-width: 180px;
+    max-width: 220px;
+}
+
+#overflow-menu.icon-grid button {
+    width: auto;
+    height: 40px;
+    padding: 8px;
+    text-align: center;
+    justify-content: center;
+    font-size: 1.2rem;
+}
+
 /* Formatting Toolbar */
 #formatting-toolbar {
     padding: 5px;

@@ -431,6 +431,31 @@ export class ButtonConfigService {
   }
 
   /**
+   * Actualizar custom mode existente con configuración actual
+   */
+  static async updateCustomMode(customId) {
+    if (!this.currentConfig || !this.currentConfig.customModes || !this.currentConfig.customModes[customId]) {
+      console.error('❌ Custom mode no encontrado:', customId);
+      return;
+    }
+
+    // Mantener el nombre pero actualizar la configuración
+    const currentName = this.currentConfig.customModes[customId].name;
+    this.currentConfig.customModes[customId] = {
+      name: currentName,
+      description: '',
+      numeracion: this.currentConfig.numeracion,
+      leftButtons: [...this.currentConfig.leftButtons],
+      rightButtons: [...this.currentConfig.rightButtons],
+      visibleButtons: Array.from(this.currentConfig.visibleButtons),
+      menuShowText: this.currentConfig.menuShowText
+    };
+
+    await this.saveConfiguration();
+    console.log('✏️ Custom mode actualizado:', currentName);
+  }
+
+  /**
    * Eliminar custom mode
    */
   static async deleteCustomMode(customId) {

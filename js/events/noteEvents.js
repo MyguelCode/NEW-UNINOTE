@@ -350,6 +350,13 @@ async function handleNoteAction(e, action, noteLi, noteData, parentArray, index,
       const overflowMenu = document.getElementById('overflow-menu');
       const config = window.ButtonConfigService.getConfig();
 
+      // Aplicar clase para grid si es solo iconos
+      if (config.menuShowText) {
+        overflowMenu.classList.remove('icon-grid');
+      } else {
+        overflowMenu.classList.add('icon-grid');
+      }
+
       // Generar contenido del menú
       overflowMenu.innerHTML = '';
       allHiddenButtons.forEach(btn => {

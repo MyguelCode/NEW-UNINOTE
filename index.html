@@ -59,7 +59,7 @@
         <button id="help-btn" title="Ayuda y Atajos">?</button>
         <button id="toggle-all-btn" title="Contraer/Expandir todas las notas">Contraer Todo</button>
         <div class="transfer-menu-container">
-            <button id="transfer-btn">Transferir v3.4 ⚙️⋮ ▾</button>
+            <button id="transfer-btn">Transferir v3.5 ⚙️⋮ ▾</button>
             <ul id="transfer-menu" class="hidden">
                 <li data-action="export-current">📤 Exportar Uninote Actual</li>
                 <li data-action="export-total">📤 Exportar Backup Total</li>
@@ -355,7 +355,10 @@
 
               <!-- Save Custom Mode -->
               <div class="form-field">
-                  <button id="save-custom-mode-btn" class="modal-button confirm-action">💾 Guardar como Modo Personalizado</button>
+                  <div style="display: flex; gap: 10px;">
+                      <button id="update-current-mode-btn" class="modal-button" style="display: none;">✏️ Actualizar Modo Actual</button>
+                      <button id="save-custom-mode-btn" class="modal-button confirm-action">💾 Guardar como Nuevo Modo</button>
+                  </div>
               </div>
           </div>
 
