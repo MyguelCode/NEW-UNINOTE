@@ -370,6 +370,10 @@
                <label for="app-lock-enable-toggle">Activar Bloqueo Total de la App</label>
            </div>
 
+           <div style="margin: 10px 0;">
+               <button id="lock-app-now-btn" class="modal-button" style="width: 100%;">🔒 Bloquear App Ahora</button>
+           </div>
+
            <div class="form-field" id="app-lock-password-container">
                 <label for="app-lock-master-password-input">Contraseña de Bloqueo Total</label>
                 <div class="password-field-container">
@@ -434,6 +438,21 @@
           <div class="modal-actions">
               <button id="unlock-confirm-btn" class="modal-button confirm-action">Aceptar</button>
               <button id="unlock-cancel-btn" class="modal-button cancel-action">Cancelar</button>
+          </div>
+      </div>
+  </div>
+
+  <!-- App Lock Modal -->
+  <div id="app-lock-modal-overlay" class="modal-overlay" style="display: none; z-index: 9999;">
+      <div class="modal-box">
+          <h2>🔒 App Bloqueada</h2>
+          <p style="text-align: center; margin: 15px 0;">Introduce tu contraseña de bloqueo total para desbloquear la aplicación</p>
+          <div class="form-field">
+              <label for="app-unlock-password-input">Contraseña</label>
+              <input type="password" id="app-unlock-password-input">
+          </div>
+          <div class="modal-actions">
+              <button id="app-unlock-confirm-btn" class="modal-button confirm-action">Desbloquear</button>
           </div>
       </div>
   </div>

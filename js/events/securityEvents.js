@@ -152,6 +152,7 @@ export function initializeSecurityEvents() {
         const { newPass } = await SecurityService.showSetPasswordModal('Crear Contraseña Maestra', false);
         if (newPass) {
           STATE.appData.masterPasswordHash = await SecurityService.hashPasswordWithSalt(newPass);
+          STATE.appData.isAppLockEnabled = true;
           if (window.saveAppDataAsync) {
             await window.saveAppDataAsync(STATE.appData);
           }
@@ -161,7 +162,12 @@ export function initializeSecurityEvents() {
           e.target.checked = false;
         }
       } else {
+        STATE.appData.isAppLockEnabled = true;
+        if (window.saveAppDataAsync) {
+          await window.saveAppDataAsync(STATE.appData);
+        }
         appLockControls.classList.remove('hidden');
+        window.NotificationService.showNotification('Bloqueo de aplicación activado.');
       }
     } else {
       const confirmed = await window.NotificationService.showConfirmationModal(
@@ -170,6 +176,10 @@ export function initializeSecurityEvents() {
       );
 
       if (confirmed) {
+        STATE.appData.isAppLockEnabled = false;
+        if (window.saveAppDataAsync) {
+          await window.saveAppDataAsync(STATE.appData);
+        }
         appLockControls.classList.add('hidden');
         window.NotificationService.showNotification('Bloqueo de aplicación desactivado.');
       } else {
@@ -207,10 +217,78 @@ export function initializeSecurityEvents() {
   // Update password fields on modal open
   appSettingsBtn.addEventListener('click', () => {
     updatePasswordFieldsDisplay();
+    // Also update toggle state
+    if (appLockEnableToggle) {
+      appLockEnableToggle.checked = !!STATE.appData.isAppLockEnabled;
+    }
   });
 
-  // Initialize password fields display
+  // Lock App Now button
+  const lockAppNowBtn = document.getElementById('lock-app-now-btn');
+  if (lockAppNowBtn) {
+    lockAppNowBtn.addEventListener('click', () => {
+      if (!STATE.appData.masterPasswordHash) {
+        window.NotificationService.showNotification('Debes crear una contraseña de bloqueo total primero.', 'warning');
+        return;
+      }
+      lockApp();
+      // Close settings modal
+      document.getElementById('app-settings-modal-overlay').classList.add('hidden');
+    });
+  }
+
+  // App unlock button
+  const appUnlockConfirmBtn = document.getElementById('app-unlock-confirm-btn');
+  const appUnlockPasswordInput = document.getElementById('app-unlock-password-input');
+  const appLockModalOverlay = document.getElementById('app-lock-modal-overlay');
+
+  if (appUnlockConfirmBtn && appUnlockPasswordInput) {
+    appUnlockConfirmBtn.addEventListener('click', async () => {
+      const password = appUnlockPasswordInput.value;
+      if (!password) return;
+
+      const isCorrect = await SecurityService.verifyPassword(password, STATE.appData.masterPasswordHash);
+      if (isCorrect) {
+        appUnlockPasswordInput.value = '';
+        appLockModalOverlay.style.display = 'none';
+        window.NotificationService.showNotification('App desbloqueada correctamente.', 'success');
+      } else {
+        window.NotificationService.showNotification('Contraseña incorrecta.', 'error');
+        appUnlockPasswordInput.style.animation = 'shake 0.5s';
+        setTimeout(() => { appUnlockPasswordInput.style.animation = '' }, 500);
+        appUnlockPasswordInput.value = '';
+        appUnlockPasswordInput.focus();
+      }
+    });
+
+    // Allow Enter key to unlock
+    appUnlockPasswordInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        appUnlockConfirmBtn.click();
+      }
+    });
+  }
+
+  // Initialize password fields display and toggle state
   updatePasswordFieldsDisplay();
+  if (appLockEnableToggle && STATE.appData) {
+    appLockEnableToggle.checked = !!STATE.appData.isAppLockEnabled;
+  }
+}
+
+/**
+ * Lock the app - show lock screen
+ */
+function lockApp() {
+  const appLockModalOverlay = document.getElementById('app-lock-modal-overlay');
+  const appUnlockPasswordInput = document.getElementById('app-unlock-password-input');
+
+  if (appLockModalOverlay && appUnlockPasswordInput) {
+    appLockModalOverlay.style.display = 'flex';
+    setTimeout(() => {
+      appUnlockPasswordInput.focus();
+    }, 100);
+  }
 }
 
 /**

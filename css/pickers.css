@@ -195,6 +195,12 @@
     font-size: 1.2rem !important;
     display: flex !important;
     align-items: center;
+    cursor: pointer;
+    background: none;
+    border: none;
+    color: var(--text-color);
+    border-radius: 4px;
+    pointer-events: auto;
 }
 
 /* Formatting Toolbar */
