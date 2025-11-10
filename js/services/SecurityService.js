@@ -187,6 +187,12 @@ export class SecurityService {
     const passwordName = isMaster ? 'de bloqueo total' : 'universal';
 
     if (action === 'create' || action === 'change') {
+      // Check if trying to create when password already exists
+      if (action === 'create' && currentHash) {
+        window.showNotification(`Ya existe una contraseña ${passwordName}. Usa "Cambiar Contraseña" para modificarla.`, 'warning');
+        return;
+      }
+
       if (action === 'change') {
         const oldPass = await window.showPromptModal('Verificación de Seguridad', `Introduce tu contraseña ${passwordName} ACTUAL:`, {type: 'password'});
         if (!oldPass || !(await this.verifyPassword(oldPass, currentHash))) {

@@ -311,7 +311,7 @@ async function handleNoteAction(e, action, noteLi, noteData, parentArray, index,
       }
       break;
 
-    case 'set-date':
+    case 'set-deadline':
       STATE.activeNoteForDatePicker = noteLi;
       const currentDueDate = noteLi.dataset.dueDate;
       if (currentDueDate) {

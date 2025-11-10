@@ -231,7 +231,7 @@ function updatePasswordFieldsDisplay() {
   }
 
   if (universalPasswordInput) {
-    if (STATE.appData.universalPassword) {
+    if (STATE.appData.universalPasswordHash) {
       universalPasswordInput.value = '••••••••••';
       universalPasswordInput.style.color = 'var(--text-color)';
     } else {
