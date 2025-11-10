@@ -33,15 +33,19 @@ export function initializeNoteEvents() {
       return;
     }
 
-    e.stopPropagation(); // Prevent click from bubbling to document
     const button = e.target.closest('button');
-
     console.log('🔵 Button found:', button, 'action:', button?.dataset?.action);
 
     if (!button) {
-      console.log('❌ No button found in click target');
+      console.log('❌ No button found in click target (probablemente espacio vacío del grid)');
+      console.log('🔵 CERRANDO MENÚ por click en espacio vacío');
+      overflowMenu.style.display = 'none';
+      STATE.activeNoteForMenu = null;
       return;
     }
+
+    // Solo prevenir propagación si hay un botón válido
+    e.stopPropagation();
 
     const noteLi = STATE.activeNoteForMenu;
     if (!noteLi) {
