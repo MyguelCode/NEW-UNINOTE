@@ -274,6 +274,7 @@ export function initializeUIEvents() {
     if (overflowMenu && overflowMenu.style.display === 'block') {
       if (!e.target.closest('#overflow-menu') && !e.target.closest('[data-action="show-menu"]')) {
         overflowMenu.style.display = 'none';
+        STATE.activeNoteForMenu = null; // Clear active note reference
       }
     }
 

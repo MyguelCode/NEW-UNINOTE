@@ -192,31 +192,38 @@ export function initializeSecurityEvents() {
   document.getElementById('app-lock-create-btn').addEventListener('click', async () => {
     await SecurityService.managePassword('master', 'create');
     updatePasswordFieldsDisplay();
+    updatePasswordButtonsVisibility();
   });
   document.getElementById('app-lock-change-btn').addEventListener('click', async () => {
     await SecurityService.managePassword('master', 'change');
     updatePasswordFieldsDisplay();
+    updatePasswordButtonsVisibility();
   });
   document.getElementById('app-lock-remove-btn').addEventListener('click', async () => {
     await SecurityService.managePassword('master', 'remove');
     updatePasswordFieldsDisplay();
+    updatePasswordButtonsVisibility();
   });
   document.getElementById('universal-create-btn').addEventListener('click', async () => {
     await SecurityService.managePassword('universal', 'create');
     updatePasswordFieldsDisplay();
+    updatePasswordButtonsVisibility();
   });
   document.getElementById('universal-change-btn').addEventListener('click', async () => {
     await SecurityService.managePassword('universal', 'change');
     updatePasswordFieldsDisplay();
+    updatePasswordButtonsVisibility();
   });
   document.getElementById('universal-remove-btn').addEventListener('click', async () => {
     await SecurityService.managePassword('universal', 'remove');
     updatePasswordFieldsDisplay();
+    updatePasswordButtonsVisibility();
   });
 
   // Update password fields on modal open
   appSettingsBtn.addEventListener('click', () => {
     updatePasswordFieldsDisplay();
+    updatePasswordButtonsVisibility();
     // Also update toggle state
     if (appLockEnableToggle) {
       appLockEnableToggle.checked = !!STATE.appData.isAppLockEnabled;
@@ -231,7 +238,7 @@ export function initializeSecurityEvents() {
         window.NotificationService.showNotification('Debes crear una contraseña de bloqueo total primero.', 'warning');
         return;
       }
-      lockApp();
+      lockApp(true);
       // Close settings modal
       document.getElementById('app-settings-modal-overlay').classList.add('hidden');
     });
@@ -250,7 +257,7 @@ export function initializeSecurityEvents() {
       const isCorrect = await SecurityService.verifyPassword(password, STATE.appData.masterPasswordHash);
       if (isCorrect) {
         appUnlockPasswordInput.value = '';
-        appLockModalOverlay.style.display = 'none';
+        unlockApp();
         window.NotificationService.showNotification('App desbloqueada correctamente.', 'success');
       } else {
         window.NotificationService.showNotification('Contraseña incorrecta.', 'error');
@@ -269,25 +276,152 @@ export function initializeSecurityEvents() {
     });
   }
 
+  // Prevent back button when locked
+  window.addEventListener('popstate', (e) => {
+    if (STATE.isAppLocked) {
+      e.preventDefault();
+      history.pushState(null, '', location.href);
+      window.NotificationService.showNotification('La app está bloqueada. Introduce tu contraseña para desbloquear.', 'warning');
+    }
+  });
+
   // Initialize password fields display and toggle state
   updatePasswordFieldsDisplay();
+  updatePasswordButtonsVisibility();
   if (appLockEnableToggle && STATE.appData) {
     appLockEnableToggle.checked = !!STATE.appData.isAppLockEnabled;
+  }
+
+  // Check if app should be locked on load
+  checkAppLockOnLoad();
+}
+
+/**
+ * Lock the app - show lock screen and save state
+ */
+function lockApp(saveState = false) {
+  const appLockModalOverlay = document.getElementById('app-lock-modal-overlay');
+  const appUnlockPasswordInput = document.getElementById('app-unlock-password-input');
+  const mainContent = document.querySelector('main');
+  const header = document.querySelector('header');
+  const aside = document.querySelector('aside');
+
+  if (appLockModalOverlay && appUnlockPasswordInput) {
+    // Hide all content
+    if (mainContent) mainContent.style.display = 'none';
+    if (header) header.style.display = 'none';
+    if (aside) aside.style.display = 'none';
+
+    // Show lock screen
+    appLockModalOverlay.style.display = 'flex';
+
+    // Set locked state
+    STATE.isAppLocked = true;
+
+    // Push history state to prevent back button
+    history.pushState(null, '', location.href);
+
+    // Save lock state if manual lock
+    if (saveState) {
+      sessionStorage.setItem('appManuallyLocked', 'true');
+    }
+
+    setTimeout(() => {
+      appUnlockPasswordInput.focus();
+    }, 100);
   }
 }
 
 /**
- * Lock the app - show lock screen
+ * Unlock the app - hide lock screen and restore content
  */
-function lockApp() {
+function unlockApp() {
   const appLockModalOverlay = document.getElementById('app-lock-modal-overlay');
-  const appUnlockPasswordInput = document.getElementById('app-unlock-password-input');
+  const mainContent = document.querySelector('main');
+  const header = document.querySelector('header');
+  const aside = document.querySelector('aside');
 
-  if (appLockModalOverlay && appUnlockPasswordInput) {
-    appLockModalOverlay.style.display = 'flex';
+  if (appLockModalOverlay) {
+    // Hide lock screen
+    appLockModalOverlay.style.display = 'none';
+
+    // Show all content
+    if (mainContent) mainContent.style.display = 'block';
+    if (header) header.style.display = 'flex';
+    if (aside) aside.style.display = 'block';
+
+    // Clear locked state
+    STATE.isAppLocked = false;
+    sessionStorage.removeItem('appManuallyLocked');
+  }
+}
+
+/**
+ * Check if app should be locked on page load
+ */
+function checkAppLockOnLoad() {
+  // Check if manually locked in this session
+  const wasManuallyLocked = sessionStorage.getItem('appManuallyLocked') === 'true';
+
+  // Check if app lock is enabled and there's a password
+  const hasAppLock = STATE.appData && STATE.appData.isAppLockEnabled && STATE.appData.masterPasswordHash;
+
+  if (wasManuallyLocked && hasAppLock) {
+    // Re-lock the app
     setTimeout(() => {
-      appUnlockPasswordInput.focus();
+      lockApp(false); // Don't save again, already in session storage
     }, 100);
+  }
+}
+
+/**
+ * Update visibility of password management buttons
+ */
+function updatePasswordButtonsVisibility() {
+  const appLockPasswordContainer = document.getElementById('app-lock-password-container');
+  const appLockCreateBtn = document.getElementById('app-lock-create-btn');
+  const appLockChangeBtn = document.getElementById('app-lock-change-btn');
+  const appLockRemoveBtn = document.getElementById('app-lock-remove-btn');
+
+  const universalCreateBtn = document.getElementById('universal-create-btn');
+  const universalChangeBtn = document.getElementById('universal-change-btn');
+  const universalRemoveBtn = document.getElementById('universal-remove-btn');
+
+  // Show/hide master password buttons based on whether password exists
+  if (appLockCreateBtn && appLockChangeBtn && appLockRemoveBtn) {
+    const hasMasterPassword = STATE.appData && STATE.appData.masterPasswordHash;
+
+    if (hasMasterPassword) {
+      appLockCreateBtn.style.display = 'none';
+      appLockChangeBtn.style.display = 'inline-block';
+      appLockRemoveBtn.style.display = 'inline-block';
+    } else {
+      appLockCreateBtn.style.display = 'inline-block';
+      appLockChangeBtn.style.display = 'none';
+      appLockRemoveBtn.style.display = 'none';
+    }
+  }
+
+  // Show/hide universal password buttons
+  if (universalCreateBtn && universalChangeBtn && universalRemoveBtn) {
+    const hasUniversalPassword = STATE.appData && STATE.appData.universalPasswordHash;
+
+    if (hasUniversalPassword) {
+      universalCreateBtn.style.display = 'none';
+      universalChangeBtn.style.display = 'inline-block';
+      universalRemoveBtn.style.display = 'inline-block';
+    } else {
+      universalCreateBtn.style.display = 'inline-block';
+      universalChangeBtn.style.display = 'none';
+      universalRemoveBtn.style.display = 'none';
+    }
+  }
+
+  // Always show password container if there's a password OR if lock is enabled
+  if (appLockPasswordContainer) {
+    const shouldShow = (STATE.appData && STATE.appData.masterPasswordHash) ||
+                       (STATE.appData && STATE.appData.isAppLockEnabled);
+    appLockPasswordContainer.style.display = shouldShow ? 'block' : 'none';
   }
 }
 

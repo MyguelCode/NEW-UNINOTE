@@ -19,20 +19,22 @@ export function initializeNoteEvents() {
 
   // Overflow menu click handler
   overflowMenu.addEventListener('click', async (e) => {
+    e.stopPropagation(); // Prevent click from bubbling to document
     const button = e.target.closest('button');
-    if (!button || !STATE.activeNoteForMenu) return;
+    if (!button) return;
 
     const noteLi = STATE.activeNoteForMenu;
+    if (!noteLi) return;
+
     const noteId = noteLi.dataset.id;
     const { note: noteData, parentArray, index } = NoteController.findNoteData(STATE.currentNotesData, noteId) || {};
-
-    // Cerrar menú
-    overflowMenu.style.display = 'none';
 
     // Ejecutar acción del botón
     const action = button.dataset.action;
     await handleNoteAction(e, action, noteLi, noteData, parentArray, index, button);
 
+    // Cerrar menú después de ejecutar la acción
+    overflowMenu.style.display = 'none';
     STATE.activeNoteForMenu = null;
   });
 
