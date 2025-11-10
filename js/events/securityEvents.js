@@ -367,10 +367,17 @@ function checkAppLockOnLoad() {
   const hasAppLock = STATE.appData && STATE.appData.isAppLockEnabled && STATE.appData.masterPasswordHash;
 
   if (wasManuallyLocked && hasAppLock) {
-    // Re-lock the app
-    setTimeout(() => {
-      lockApp(false); // Don't save again, already in session storage
-    }, 100);
+    // Hide content IMMEDIATELY before any rendering happens
+    const mainContent = document.querySelector('main');
+    const header = document.querySelector('header');
+    const aside = document.querySelector('aside');
+
+    if (mainContent) mainContent.style.display = 'none';
+    if (header) header.style.display = 'none';
+    if (aside) aside.style.display = 'none';
+
+    // Re-lock the app immediately (no timeout)
+    lockApp(false); // Don't save again, already in session storage
   }
 }
 

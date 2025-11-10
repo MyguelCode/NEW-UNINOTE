@@ -19,12 +19,31 @@ export function initializeNoteEvents() {
 
   // Overflow menu click handler
   overflowMenu.addEventListener('click', async (e) => {
+    console.log('🔵 OVERFLOW MENU CLICKED', {
+      target: e.target,
+      tagName: e.target.tagName,
+      classList: e.target.classList.toString(),
+      hasIconGrid: overflowMenu.classList.contains('icon-grid'),
+      display: overflowMenu.style.display
+    });
+
     e.stopPropagation(); // Prevent click from bubbling to document
     const button = e.target.closest('button');
-    if (!button) return;
+
+    console.log('🔵 Button found:', button, 'action:', button?.dataset?.action);
+
+    if (!button) {
+      console.log('❌ No button found in click target');
+      return;
+    }
 
     const noteLi = STATE.activeNoteForMenu;
-    if (!noteLi) return;
+    if (!noteLi) {
+      console.log('❌ No activeNoteForMenu in STATE');
+      return;
+    }
+
+    console.log('✅ Processing overflow menu action:', button.dataset.action);
 
     const noteId = noteLi.dataset.id;
     const { note: noteData, parentArray, index } = NoteController.findNoteData(STATE.currentNotesData, noteId) || {};
@@ -34,8 +53,10 @@ export function initializeNoteEvents() {
     await handleNoteAction(e, action, noteLi, noteData, parentArray, index, button);
 
     // Cerrar menú después de ejecutar la acción
+    console.log('🔵 Cerrando overflow menu después de acción');
     overflowMenu.style.display = 'none';
     STATE.activeNoteForMenu = null;
+    console.log('🔵 Overflow menu cerrado, activeNoteForMenu = null');
   });
 
   // Main note click handler
@@ -338,11 +359,14 @@ async function handleNoteAction(e, action, noteLi, noteData, parentArray, index,
 
     case 'show-menu':
       // Show overflow menu with hidden buttons
+      console.log('🟢 SHOW-MENU: Abriendo overflow menu');
       e.stopPropagation();
 
       // Obtener botones ocultos
       const { leftHidden, rightHidden } = window.ButtonConfigService.getButtonsForNote(STATE.isArchiveViewActive);
       const allHiddenButtons = [...leftHidden, ...rightHidden];
+
+      console.log('🟢 SHOW-MENU: Botones ocultos:', allHiddenButtons.length, allHiddenButtons.map(b => b.label));
 
       if (allHiddenButtons.length === 0) {
         console.log('⚠️ No hay botones ocultos para mostrar en el menú');
@@ -352,11 +376,15 @@ async function handleNoteAction(e, action, noteLi, noteData, parentArray, index,
       const overflowMenu = document.getElementById('overflow-menu');
       const config = window.ButtonConfigService.getConfig();
 
+      console.log('🟢 SHOW-MENU: Config menuShowText:', config.menuShowText);
+
       // Aplicar clase para grid si es solo iconos
       if (config.menuShowText) {
         overflowMenu.classList.remove('icon-grid');
+        console.log('🟢 SHOW-MENU: Modo LISTA (con texto)');
       } else {
         overflowMenu.classList.add('icon-grid');
+        console.log('🟢 SHOW-MENU: Modo GRID (solo iconos)');
       }
 
       // Generar contenido del menú
@@ -381,6 +409,8 @@ async function handleNoteAction(e, action, noteLi, noteData, parentArray, index,
         overflowMenu.appendChild(button);
       });
 
+      console.log('🟢 SHOW-MENU: Botones creados en el DOM:', overflowMenu.children.length);
+
       // Posicionar y mostrar menú
       const menuRect = target.getBoundingClientRect();
       overflowMenu.style.display = 'block';
@@ -389,7 +419,15 @@ async function handleNoteAction(e, action, noteLi, noteData, parentArray, index,
       if (menuLeftPos < 0) menuLeftPos = 5;
       overflowMenu.style.left = `${menuLeftPos}px`;
 
+      console.log('🟢 SHOW-MENU: Menú posicionado y mostrado', {
+        display: overflowMenu.style.display,
+        hasIconGrid: overflowMenu.classList.contains('icon-grid'),
+        top: overflowMenu.style.top,
+        left: overflowMenu.style.left
+      });
+
       STATE.activeNoteForMenu = noteLi;
+      console.log('🟢 SHOW-MENU: STATE.activeNoteForMenu establecido');
       break;
 
     case 'duplicate':
