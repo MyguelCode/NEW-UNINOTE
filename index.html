@@ -16,6 +16,33 @@
   <link rel="stylesheet" href="css/search.css">
   <link rel="stylesheet" href="css/animations.css">
   <link rel="stylesheet" href="css/utilities.css">
+
+  <!-- Pre-load lock check - Execute BEFORE any rendering -->
+  <script>
+    (function() {
+      // Check if app was manually locked
+      const wasLocked = sessionStorage.getItem('appManuallyLocked') === 'true';
+      if (wasLocked) {
+        // Immediately hide all content before anything renders
+        document.documentElement.style.visibility = 'hidden';
+
+        // Once DOM is ready, apply permanent hiding
+        window.addEventListener('DOMContentLoaded', function() {
+          const style = document.createElement('style');
+          style.textContent = `
+            main, header, aside {
+              display: none !important;
+            }
+            #app-lock-modal-overlay {
+              display: flex !important;
+            }
+          `;
+          document.head.appendChild(style);
+          document.documentElement.style.visibility = 'visible';
+        });
+      }
+    })();
+  </script>
 </head>
 <body>
 

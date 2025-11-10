@@ -27,6 +27,12 @@ export function initializeNoteEvents() {
       display: overflowMenu.style.display
     });
 
+    // Ignorar clicks si el menú está cerrado (puede pasar si se cerró por global click handler)
+    if (overflowMenu.style.display === 'none') {
+      console.log('⚠️ OVERFLOW MENU: Menú está cerrado, ignorando click');
+      return;
+    }
+
     e.stopPropagation(); // Prevent click from bubbling to document
     const button = e.target.closest('button');
 
