@@ -271,20 +271,48 @@ export function initializeUIEvents() {
   document.addEventListener('click', (e) => {
     // Cerrar overflow menu si se hace click fuera de él
     const overflowMenu = document.getElementById('overflow-menu');
+
+    // Logs SIEMPRE para diagnosticar
+    console.log('🟡 GLOBAL CLICK detectado:', {
+      target: e.target,
+      tagName: e.target.tagName,
+      classList: e.target.classList.toString(),
+      id: e.target.id || 'sin-id',
+      menuDisplay: overflowMenu ? overflowMenu.style.display : 'N/A',
+      menuExists: !!overflowMenu
+    });
+
     if (overflowMenu && overflowMenu.style.display === 'block') {
-      console.log('🟡 GLOBAL CLICK: Overflow menu está abierto', {
-        clickTarget: e.target,
-        isInsideMenu: !!e.target.closest('#overflow-menu'),
-        isShowMenuButton: !!e.target.closest('[data-action="show-menu"]')
+      console.log('🟡 GLOBAL CLICK: ⚠️ Overflow menu está ABIERTO (display: block)');
+
+      const isInsideMenu = !!e.target.closest('#overflow-menu');
+      const isShowMenuButton = !!e.target.closest('[data-action="show-menu"]');
+
+      console.log('🟡 GLOBAL CLICK: Análisis del click', {
+        clickTargetDetails: {
+          element: e.target,
+          path: e.composedPath ? e.composedPath().map(el => el.tagName || el.nodeName).join(' > ') : 'N/A'
+        },
+        isInsideMenu: isInsideMenu,
+        isShowMenuButton: isShowMenuButton,
+        shouldClose: !isInsideMenu && !isShowMenuButton
       });
 
-      if (!e.target.closest('#overflow-menu') && !e.target.closest('[data-action="show-menu"]')) {
-        console.log('🟡 GLOBAL CLICK: Cerrando overflow menu (click fuera)');
+      if (!isInsideMenu && !isShowMenuButton) {
+        console.log('🟡 GLOBAL CLICK: 🚨 CERRANDO overflow menu (click fuera del menú)');
         overflowMenu.style.display = 'none';
         STATE.activeNoteForMenu = null; // Clear active note reference
-        console.log('🟡 GLOBAL CLICK: Overflow menu cerrado, activeNoteForMenu = null');
+        console.log('🟡 GLOBAL CLICK: ✅ Overflow menu CERRADO, activeNoteForMenu = null');
+        console.log('🟡 GLOBAL CLICK: ✅ Menu display después de cerrar:', overflowMenu.style.display);
       } else {
-        console.log('🟡 GLOBAL CLICK: Click dentro del menú o en botón show-menu, NO cerrando');
+        console.log('🟡 GLOBAL CLICK: ❌ NO cerrando - Razón:', {
+          isInsideMenu: isInsideMenu ? 'Click DENTRO del menú' : false,
+          isShowMenuButton: isShowMenuButton ? 'Click en botón show-menu' : false
+        });
+      }
+    } else {
+      if (overflowMenu && overflowMenu.style.display !== 'block') {
+        console.log('🟡 GLOBAL CLICK: Overflow menu NO está abierto (display:', overflowMenu.style.display + ')');
       }
     }
 

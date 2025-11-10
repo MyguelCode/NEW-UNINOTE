@@ -249,17 +249,37 @@ export function initializeSecurityEvents() {
   const appUnlockPasswordInput = document.getElementById('app-unlock-password-input');
   const appLockModalOverlay = document.getElementById('app-lock-modal-overlay');
 
+  console.log('🔐 UNLOCK HANDLER: Botones encontrados', {
+    unlockBtn: !!appUnlockConfirmBtn,
+    passwordInput: !!appUnlockPasswordInput,
+    modalOverlay: !!appLockModalOverlay
+  });
+
   if (appUnlockConfirmBtn && appUnlockPasswordInput) {
     appUnlockConfirmBtn.addEventListener('click', async () => {
+      console.log('🔐 UNLOCK: Click en botón desbloquear');
       const password = appUnlockPasswordInput.value;
-      if (!password) return;
+      console.log('🔐 UNLOCK: Password ingresado:', password ? `${password.length} caracteres` : 'VACÍO');
+
+      if (!password) {
+        console.log('❌ UNLOCK: Password vacío, abortando');
+        return;
+      }
+
+      console.log('🔐 UNLOCK: Verificando contraseña...');
+      console.log('🔐 UNLOCK: STATE.appData:', STATE.appData ? 'existe' : 'NULL');
+      console.log('🔐 UNLOCK: masterPasswordHash:', STATE.appData?.masterPasswordHash ? 'existe' : 'NULL');
 
       const isCorrect = await SecurityService.verifyPassword(password, STATE.appData.masterPasswordHash);
+      console.log('🔐 UNLOCK: Resultado verificación:', isCorrect ? '✅ CORRECTA' : '❌ INCORRECTA');
+
       if (isCorrect) {
+        console.log('✅ UNLOCK: Contraseña correcta, desbloqueando...');
         appUnlockPasswordInput.value = '';
         unlockApp();
         window.NotificationService.showNotification('App desbloqueada correctamente.', 'success');
       } else {
+        console.log('❌ UNLOCK: Contraseña incorrecta');
         window.NotificationService.showNotification('Contraseña incorrecta.', 'error');
         appUnlockPasswordInput.style.animation = 'shake 0.5s';
         setTimeout(() => { appUnlockPasswordInput.style.animation = '' }, 500);
@@ -336,6 +356,7 @@ function lockApp(saveState = false) {
  * Unlock the app - hide lock screen and restore content
  */
 function unlockApp() {
+  console.log('🔓 UNLOCK: Desbloqueando app...');
   const appLockModalOverlay = document.getElementById('app-lock-modal-overlay');
   const mainContent = document.querySelector('main');
   const header = document.querySelector('header');
@@ -344,15 +365,23 @@ function unlockApp() {
   if (appLockModalOverlay) {
     // Hide lock screen
     appLockModalOverlay.style.display = 'none';
+    console.log('🔓 UNLOCK: Modal ocultado');
 
     // Show all content
     if (mainContent) mainContent.style.display = 'block';
     if (header) header.style.display = 'flex';
     if (aside) aside.style.display = 'block';
+    console.log('🔓 UNLOCK: Contenido mostrado');
+
+    // Remove pre-locked classes
+    document.documentElement.classList.remove('pre-locked');
+    document.body.classList.remove('pre-locked');
+    console.log('🔓 UNLOCK: Clases pre-locked removidas');
 
     // Clear locked state
     STATE.isAppLocked = false;
     sessionStorage.removeItem('appManuallyLocked');
+    console.log('🔓 UNLOCK: Estado limpiado, app desbloqueada');
   }
 }
 
