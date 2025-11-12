@@ -51,6 +51,9 @@ export function initializeNoteEvents() {
     const noteLi = STATE.activeNoteForMenu;
     if (!noteLi) {
       console.log('❌ No activeNoteForMenu in STATE');
+      // ⚡ CRÍTICO: Cerrar menú incluso si no hay activeNoteForMenu
+      overflowMenu.style.display = 'none';
+      STATE.activeNoteForMenu = null;
       return;
     }
 
@@ -59,15 +62,17 @@ export function initializeNoteEvents() {
     const noteId = noteLi.dataset.id;
     const { note: noteData, parentArray, index } = NoteController.findNoteData(STATE.currentNotesData, noteId) || {};
 
-    // Ejecutar acción del botón
-    const action = button.dataset.action;
-    await handleNoteAction(e, action, noteLi, noteData, parentArray, index, button);
-
-    // Cerrar menú después de ejecutar la acción
-    console.log('🔵 Cerrando overflow menu después de acción');
-    overflowMenu.style.display = 'none';
-    STATE.activeNoteForMenu = null;
-    console.log('🔵 Overflow menu cerrado, activeNoteForMenu = null');
+    // Ejecutar acción del botón con try-finally para GARANTIZAR que el menú se cierre
+    try {
+      const action = button.dataset.action;
+      await handleNoteAction(e, action, noteLi, noteData, parentArray, index, button);
+    } finally {
+      // ⚡ CRÍTICO: SIEMPRE cerrar menú, incluso si hay error o el usuario cancela el modal
+      console.log('🔵 FINALLY: Cerrando overflow menu (GARANTIZADO)');
+      overflowMenu.style.display = 'none';
+      STATE.activeNoteForMenu = null;
+      console.log('🔵 FINALLY: Overflow menu cerrado, activeNoteForMenu = null');
+    }
   });
 
   // Main note click handler
