@@ -301,6 +301,7 @@ export function initializeUIEvents() {
       if (!isInsideMenu && !isShowMenuButton) {
         console.log('🟡 GLOBAL CLICK: 🚨 CERRANDO overflow menu (click fuera del menú)');
         overflowMenu.style.display = 'none';
+        overflowMenu.classList.remove('icon-grid'); // ⚡ Remover clase para que CSS display:grid !important no interfiera
         STATE.activeNoteForMenu = null; // Clear active note reference
         console.log('🟡 GLOBAL CLICK: ✅ Overflow menu CERRADO, activeNoteForMenu = null');
         console.log('🟡 GLOBAL CLICK: ✅ Menu display después de cerrar:', overflowMenu.style.display);
@@ -340,7 +341,8 @@ export function initializeUIEvents() {
         'help-modal-overlay',
         'notification-center-overlay',
         'app-settings-modal-overlay',
-        'date-picker-modal-overlay'
+        'date-picker-modal-overlay',
+        'duplicate-modal-overlay'
       ];
 
       if (closableModals.includes(modalOverlay.id)) {

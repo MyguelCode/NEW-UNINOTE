@@ -44,6 +44,7 @@ export function initializeNoteEvents() {
       console.log('❌ No button found in click target (probablemente espacio vacío del grid)');
       console.log('🔵 CERRANDO MENÚ por click en espacio vacío');
       overflowMenu.style.display = 'none';
+      overflowMenu.classList.remove('icon-grid'); // ⚡ Remover clase para que CSS no interfiera
       STATE.activeNoteForMenu = null;
       return;
     }
@@ -53,6 +54,7 @@ export function initializeNoteEvents() {
       console.log('❌ No activeNoteForMenu in STATE');
       // ⚡ CRÍTICO: Cerrar menú incluso si no hay activeNoteForMenu
       overflowMenu.style.display = 'none';
+      overflowMenu.classList.remove('icon-grid'); // ⚡ Remover clase para que CSS no interfiera
       STATE.activeNoteForMenu = null;
       return;
     }
@@ -70,6 +72,7 @@ export function initializeNoteEvents() {
       // ⚡ CRÍTICO: SIEMPRE cerrar menú, incluso si hay error o el usuario cancela el modal
       console.log('🔵 FINALLY: Cerrando overflow menu (GARANTIZADO)');
       overflowMenu.style.display = 'none';
+      overflowMenu.classList.remove('icon-grid'); // ⚡ Remover clase para que CSS display:grid !important no interfiera
       STATE.activeNoteForMenu = null;
       console.log('🔵 FINALLY: Overflow menu cerrado, activeNoteForMenu = null');
     }

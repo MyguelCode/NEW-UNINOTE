@@ -116,6 +116,15 @@ export class NotificationService {
         onlyNoteBtn.onclick = null;
         withChildrenBtn.onclick = null;
         cancelBtn.onclick = null;
+        duplicateOverlay.onclick = null; // Limpiar event listener del overlay
+      };
+
+      // Click en overlay (fuera del modal-box) para cancelar
+      duplicateOverlay.onclick = (e) => {
+        if (e.target === duplicateOverlay) {
+          cleanup();
+          resolve(null);
+        }
       };
 
       onlyNoteBtn.onclick = () => { cleanup(); resolve('only'); };
