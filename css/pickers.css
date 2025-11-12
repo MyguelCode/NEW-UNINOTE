@@ -158,6 +158,11 @@
     text-align: left;
     border-radius: 4px;
     display: block;
+    /* Asegurar que el botón captura todos los clicks, no el contenido */
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    cursor: pointer;
 }
 
 #context-menu button:hover, #lock-menu button:hover, #overflow-menu button:hover {
@@ -201,6 +206,10 @@
     color: var(--text-color);
     border-radius: 4px;
     pointer-events: auto;
+    /* Asegurar que el botón captura todos los clicks, no el contenido (emoji) */
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
 }
 
 /* Formatting Toolbar */

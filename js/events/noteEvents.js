@@ -19,6 +19,9 @@ export function initializeNoteEvents() {
 
   // Overflow menu click handler
   overflowMenu.addEventListener('click', async (e) => {
+    // ⚡ CRÍTICO: Detener propagación INMEDIATAMENTE para evitar que el global click handler cierre el menú
+    e.stopPropagation();
+
     console.log('🔵 OVERFLOW MENU CLICKED', {
       target: e.target,
       tagName: e.target.tagName,
@@ -33,6 +36,7 @@ export function initializeNoteEvents() {
       return;
     }
 
+    // Buscar el botón - funciona incluso si el click fue en un text node (emoji)
     const button = e.target.closest('button');
     console.log('🔵 Button found:', button, 'action:', button?.dataset?.action);
 
@@ -43,9 +47,6 @@ export function initializeNoteEvents() {
       STATE.activeNoteForMenu = null;
       return;
     }
-
-    // Solo prevenir propagación si hay un botón válido
-    e.stopPropagation();
 
     const noteLi = STATE.activeNoteForMenu;
     if (!noteLi) {
