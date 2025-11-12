@@ -183,7 +183,7 @@
 
 /* Overflow menu - Grid mode (icon only) */
 #overflow-menu.icon-grid {
-    display: grid !important;
+    display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 4px;
     padding: 8px;
